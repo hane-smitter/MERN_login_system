@@ -3,52 +3,41 @@ const express = require("express");
 const app = express();
 
 const { db } = require("./dbConn/mongoose/mongoose.js");
+const router = require("./routes/routes.js");
+const {
+  AppErrorHandler,
+  LostErrorHandler,
+} = require("./errors/errorHandler.js");
 const PORT = process.env.PORT || 8000;
 
+// Parse requests with Content-Type application/json
+// so that data is available on req body
+app.use(express.json());
+
 app.get("/", function (req, res) {
-  res.send("Hello World");
+  res.send("Hello Welcome to API !!");
 });
 
-// Handling routes not found
+// Routes for our application
+app.use("/api", router);
 
-app.get("*", function (req, res, next) {
+// Fail gracefully request for routes not supported by the server
+// on all http methods
+app.all("*", function (req, res, next) {
   // Trigger a 404
   // We're not responding here
   next();
 });
 
-/* 
-app.get("/403", function (req, res, next) {
-  // trigger a 403 error
-  const err = new Error("not allowed!");
-  err.status = 403;
-  next(err);
-});
-
-app.get("/500", function (req, res, next) {
-  // trigger a generic (500) error
-  const err = new Error("keyboard cat!");
-  next(err);
-});
-*/
-
 // NoN-Error handling Middleware
-app.use(function (req, res, next) {
-  res.status(404);
-
-  res.json({ error: "Not found" });
-});
+app.use(LostErrorHandler);
 
 // Error handling Middleware
-app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({ error: err?.message });
-});
+app.use(AppErrorHandler);
 
 // Connect to DB then start listening on PORT
-
 db.once("open", () => {
-  console.log("Database is connected!");
+  console.log("Database is connected !!");
   app.emit("ready");
 });
 app.on("ready", () => {

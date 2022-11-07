@@ -14,7 +14,7 @@ db.on("error", (err) => {
     // console.log(err);
     mongoose.connect(connURI);
   }
-  console.log(err.message);
+  console.log(`----${err.message}----`);
 });
 
 module.exports = { db };
