@@ -30,11 +30,17 @@ const UserSchema = new User({
 });
 
 UserSchema.pre("save", async function (next) {
-  // Only hash Password if it has been Modified
-  if (this.isModified("password")) {
-    let salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+  try {
+    // Only hash Password if it has been Modified
+    if (this.isModified("password")) {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+    }
     next();
+  } catch (error) {
+    // If you call `next()` with an argument, that argument is assumed to be
+    // an error
+    next(error);
   }
 });
 
@@ -49,6 +55,7 @@ UserSchema.statics.findByCredentials = async (email, password) => {
 UserSchema.methods.generateAcessToken = async function () {
   const accessToken = jwt.sign(
     {
+      _id: this._id,
       fullName: `${this.firstName} ${this.lastName}`,
       email: this.email,
     },
