@@ -1,14 +1,22 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const CustomError = require("../errors/customErrorConstructor");
 
 // ENV Vars
-const aTknSecret = process.env.AUTH_ACCESS_TOKEN_SECRET;
-const aTknExpiry = process.env.AUTH_ACCESS_TOKEN_EXPIRY;
-const rTknSecret = process.env.AUTH_REFRESH_TOKEN_SECRET;
-const rTknExpiry = process.env.AUTH_REFRESH_TOKEN_EXPIRY;
+const ACCESS_TOKEN = {
+  secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
+  expiry: process.env.AUTH_ACCESS_TOKEN_EXPIRY,
+};
+const REFRESH_TOKEN = {
+  secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
+  expiry: process.env.AUTH_REFRESH_TOKEN_EXPIRY,
+};
+const RESET_PASSWORD_TOKEN = {
+  expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
+};
 
 const User = mongoose.Schema;
 
@@ -48,7 +56,7 @@ UserSchema.statics.findByCredentials = async (email, password) => {
   const user = await UserModel.findOne({ email });
   if (!user) throw new CustomError("Wrong credentials!", 401);
   const passwdMatch = await bcrypt.compare(password, user.password);
-  if (!passwdMatch) throw new ErrorResponse("Wrong credentials!!", 401);
+  if (!passwdMatch) throw new CustomError("Wrong credentials!!", 401);
   return user;
 };
 
@@ -59,12 +67,12 @@ UserSchema.methods.generateAcessToken = async function () {
       fullName: `${this.firstName} ${this.lastName}`,
       email: this.email,
     },
-    aTknSecret,
+    ACCESS_TOKEN.secret,
     {
-      expiresIn: aTknExpiry,
+      expiresIn: ACCESS_TOKEN.expiry,
     }
   );
-  this.tokens = this.tokens.push({ token });
+  this.tokens.push({ token: accessToken });
   await this.save();
 
   return accessToken;
@@ -75,13 +83,28 @@ UserSchema.methods.generateRefreshToken = function () {
     {
       _id: this._id.toString(),
     },
-    rTknSecret,
+    REFRESH_TOKEN.secret,
     {
-      expiresIn: rTknExpiry,
+      expiresIn: REFRESH_TOKEN.expiry,
     }
   );
 
   return refreshToken;
+};
+
+UserSchema.methods.generateResetToken = async function () {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  // Hash the reset token
+  this.resetpasswordtoken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.resetpasswordtokenexpiry =
+    Date.now() + (RESET_PASSWORD_TOKEN.expiry || 5) * 60 * 1000;
+  await this.save();
+  return resetToken;
 };
 
 // Compile model from schema

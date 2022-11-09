@@ -9,12 +9,7 @@ module.exports.loginValidator = [
     .bail()
     .isEmail()
     .withMessage("Email is invalid"),
-  body("password")
-    .notEmpty()
-    .withMessage("Password CANNOT be empty")
-    .bail()
-    .isLength({ min: 4 })
-    .withMessage("Password MUST be at least 4 chars long"),
+  body("password").notEmpty().withMessage("Password CANNOT be empty"),
 ];
 
 module.exports.signupValidator = [
@@ -41,4 +36,14 @@ module.exports.signupValidator = [
     .bail()
     .isLength({ min: 4 })
     .withMessage("Password MUST be at least 4 characters long"),
+];
+
+module.exports.forgotPasswordValidator = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email CANNOT be empty")
+    .bail()
+    .isEmail()
+    .withMessage("Email is invalid"),
 ];
