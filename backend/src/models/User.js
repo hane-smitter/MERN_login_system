@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 
 const CustomError = require("../errors/customErrorConstructor");
 
@@ -15,6 +15,7 @@ const REFRESH_TOKEN = {
   expiry: process.env.AUTH_REFRESH_TOKEN_EXPIRY,
 };
 const RESET_PASSWORD_TOKEN = {
+  secret: process.env.RESET_PASSWORD_TOKEN_SECRET,
   expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
 };
 
@@ -95,15 +96,17 @@ UserSchema.methods.generateRefreshToken = function () {
 UserSchema.methods.generateResetToken = async function () {
   const resetToken = crypto.randomBytes(20).toString("hex");
 
-  // Hash the reset token
+  // Encrypt the resetToken before storing in DB
   this.resetpasswordtoken = crypto
-    .createHash("sha256")
+    .createHmac("sha256", RESET_PASSWORD_TOKEN.secret)
     .update(resetToken)
     .digest("hex");
-
   this.resetpasswordtokenexpiry =
     Date.now() + (RESET_PASSWORD_TOKEN.expiry || 5) * 60 * 1000;
+
+  // Save
   await this.save();
+
   return resetToken;
 };
 

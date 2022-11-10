@@ -11,6 +11,7 @@ const db = mongoose.connection;
 
 db.on("error", (err) => {
   if (err.message.code === "ETIMEDOUT") {
+    console.log(`----${err.message.code}----`);
     // console.log(err);
     mongoose.connect(connURI);
   }

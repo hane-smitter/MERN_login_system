@@ -1,4 +1,6 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
+const crypto = require("node:crypto");
+
 const User = require("../models/User");
 
 module.exports.loginValidator = [
@@ -46,4 +48,21 @@ module.exports.forgotPasswordValidator = [
     .bail()
     .isEmail()
     .withMessage("Email is invalid"),
+];
+
+module.exports.resetPasswordValidator = [
+  param("resetToken").notEmpty().withMessage("Reset token missing"),
+  body("password")
+    .notEmpty()
+    .withMessage("Password CANNOT be empty")
+    .bail()
+    .isLength({ min: 4 })
+    .withMessage("Password MUST be at least 4 characters long"),
+  body("passwordConfirm").custom((value, { req }) => {
+    if (value !== req.body.password) {
+      throw new Error("Passwords DO NOT match");
+    }
+
+    return true;
+  }),
 ];

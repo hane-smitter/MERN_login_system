@@ -1,0 +1,191 @@
+{
+	"info": {
+		"_postman_id": "e4ab313b-d7d8-4ebc-a403-cbc7ea03b154",
+		"name": "MERN Login System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"hanesmitter918@gmail.com\",\n    \"password\": \"smart1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Eli\",\n    \"lastName\": \"Wendo\",\n    \"email\": \"hanesmitter918@gmail.com\",\n    \"password\": \"smart1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzZhN2I3MGMyYzE1ZGNmNmQ2MWZjMmMiLCJmdWxsTmFtZSI6IkVsaSBXZW5kbyIsImVtYWlsIjoiaGFuZXNtaXR0ZXI5MThAZ21haWwuY29tIiwiaWF0IjoxNjY3OTI0MjU5LCJleHAiOjE2Njc5MjQzNzl9.MIcCNjbuisMp7a1hdX3fHozBcW9QX_K4QdyL_zV4HvI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "refresh access token",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzZhN2I3MGMyYzE1ZGNmNmQ2MWZjMmMiLCJmdWxsTmFtZSI6IkVsaSBXZW5kbyIsImVtYWlsIjoiaGFuZXNtaXR0ZXI5MThAZ21haWwuY29tIiwiaWF0IjoxNjY3OTIyOTQ0LCJleHAiOjE2Njc5MjMwNjR9.zUhHt4r2pNqy6lxOqJc_lrA1OipOU0ILMA3ES6uDrC0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "refreshTkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzZhNWVjOGJkZjIwNzMwMjU1YTgxZDkiLCJpYXQiOjE2Njc5MjA0NjQsImV4cCI6MTY2ODAwNjg2NH0.qrTc6RK2IuJQv06eVbqNNlk9XyIQXWqeBa2_lb14ELs;",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/reauth",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"reauth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Email password reset",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "postman-env-testing.app",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"hanesmitter918@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/forgotpass",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"forgotpass"
+					]
+				},
+				"description": "Send a password reset link to email of the requesting user"
+			},
+			"response": []
+		},
+		{
+			"name": "Reset Password",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/resetpass/hdfjgbnsdsjdggjskqacacqmc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"resetpass",
+						"hdfjgbnsdsjdggjskqacacqmc"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

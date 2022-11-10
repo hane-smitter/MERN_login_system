@@ -55,6 +55,7 @@ module.exports.authCheck = async (req, res, next) => {
     next();
   } catch (err) {
     // Things didn't go well
+    console.log(err);
     next(err);
   }
 };

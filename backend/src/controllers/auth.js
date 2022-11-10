@@ -10,10 +10,16 @@
 
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const crypto = require("node:crypto");
 
 const CustomError = require("../errors/customErrorConstructor");
 const User = require("../models/User");
 const { sendEmail } = require("../services/email/sendEmail");
+
+const RESET_PASSWORD_TOKEN = {
+  secret: process.env.RESET_PASSWORD_TOKEN_SECRET,
+  expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
+};
 
 const REFRESH_TOKEN_COOKIE = {
   name: "refreshTkn",
@@ -181,6 +187,7 @@ module.exports.logout = async (req, res, next) => {
       success: true,
     });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
@@ -195,22 +202,28 @@ module.exports.forgotPassword = async (req, res, next) => {
     const email = req.body.email;
 
     const user = await User.findOne({ email });
-    if (!user) throw new ErrorResponse("Email not sent", 404);
+    if (!user) throw new CustomError("Email not sent", 404);
 
     const resetToken = await user.generateResetToken();
     const origin = req.header("Origin");
-
-    console.log("request origin ", origin);
 
     const resetUrl = `${origin}/passwordreset/${resetToken}`;
 
     const message = `
             <h1>You have requested a password reset</h1>
-            <p>Please go to this link to reset your password.</p>
-            <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
-            <p>This password reset link will <strong>expire after ${
-              process.env.EMAIL_RESET_PASSWORD_TOKEN_EXPIRY_MINS || 5
-            } minutes.</strong></p>
+            <p>You are receiving this because you have requested to reset password for your account.<br/>
+              Please click on the following link, or paste in your browser to complete the password reset.
+            </p>
+            <p>
+              <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+            </p>
+            <p>
+              <em>
+                This password reset link will <strong>expire after ${
+                  process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS || 5
+                } minutes.</strong>
+              </em>
+            </p>
         `;
     try {
       await sendEmail({
@@ -219,13 +232,11 @@ module.exports.forgotPassword = async (req, res, next) => {
         subject: "Reset password",
       });
 
-      let info = {
+      res.json({
         message:
           "An email has been sent to your email address. Check your email, and visit the link to reset your password",
-        severity: "success",
-        code: "REGULAR_USER_FORGOTPASSWORD_RESET_EMAIL",
-      };
-      res.json(info);
+        success: true,
+      });
     } catch (err) {
       user.resetpasswordtoken = undefined;
       user.resetpasswordtokenexpiry = undefined;
@@ -234,5 +245,39 @@ module.exports.forgotPassword = async (req, res, next) => {
     }
   } catch (err) {
     next(err);
+  }
+};
+
+module.exports.resetPassword = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new CustomError(errors.array(), 422);
+    }
+
+    const resetToken = req.params.resetToken;
+    const decryptedResetToken = crypto
+      .createHmac("sha256", RESET_PASSWORD_TOKEN.secret)
+      .update(resetToken)
+      .digest("hex");
+    console.log({ decryptedResetToken });
+    const user = await User.findOne({
+      resetpasswordtoken: decryptedResetToken,
+      resetpasswordtokenexpiry: { $gt: Date.now() },
+    });
+    if (!user) throw new CustomError("The reset link is invalid", 400);
+
+    user.password = req.body.password;
+    user.resetpasswordtoken = undefined;
+    user.resetpasswordtokenexpiry = undefined;
+
+    await user.save();
+    res.json({
+      message: "Password reset successful",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
   }
 };
