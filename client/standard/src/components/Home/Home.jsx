@@ -2,12 +2,17 @@ import React from "react";
 import Stack from "react-bootstrap/Stack";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import image from "../../images/capital.jpg";
+import { demo } from "../../redux/actions";
 
 function Home() {
+  const dispatch = useDispatch();
+
   return (
     <Stack direction="horizontal" gap={2}>
+      <button onClick={() => dispatch(demo())}>Demo Click</button>
       <div>
         <img
           src={image}

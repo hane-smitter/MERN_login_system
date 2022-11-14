@@ -162,7 +162,7 @@
 						"forgotpass"
 					]
 				},
-				"description": "Send a password reset link to email of the requesting user"
+				"description": "Email a password reset link if user is found"
 			},
 			"response": []
 		},

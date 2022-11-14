@@ -1,12 +1,12 @@
 import axios from "axios";
 
-const BASEURL = "http://localhost:8000";
+const BASEURL = "http://localhost:8000/api/";
 
 const config = {
   baseURL: BASEURL,
 };
 
 // config.headers["cache-control"] = `no-cache`;
-const request = axios.create(config);
+const http = axios.create(config);
 
-export default request;
+export default http;
