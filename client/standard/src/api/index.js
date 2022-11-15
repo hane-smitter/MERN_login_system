@@ -28,6 +28,7 @@
 import http from "../utils/standardHttp";
 // import request from "src/request";
 
-export const login = (data) => http.post("/login", data);
+export const login = (data) =>
+  http.get("/login", data);
 export const refreshAccessToken = () =>
   http.get("/reauth", { withCredentials: true, requireAuthHeader: true });

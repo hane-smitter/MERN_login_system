@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import image from "../../images/capital.jpg";
-import { demo } from "../../redux/actions";
+import { demo, demoAddToDo } from "../../redux/dispatchers";
 
 function Home() {
   const dispatch = useDispatch();
@@ -13,6 +13,7 @@ function Home() {
   return (
     <Stack direction="horizontal" gap={2}>
       <button onClick={() => dispatch(demo())}>Demo Click</button>
+      <button onClick={() => dispatch(demoAddToDo())}>Mod redux store</button>
       <div>
         <img
           src={image}

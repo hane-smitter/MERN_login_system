@@ -16,6 +16,9 @@ const router = express.Router();
 router.get("/test", function (req, res) {
   res.send("Hello its working!!");
 });
+router.all("/longwait", function (req, res) {
+  // res.send("Unening wait!!");
+});
 
 /**
  * @method - POST

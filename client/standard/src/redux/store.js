@@ -1,13 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import todosReducer from "./reducers/todosSlice";
-// import filtersReducer from "./features/filters/filtersSlice";
+import feedbackSlice from "./reducers/feedbackSlice";
+import authSlice from "./reducers/authSlice";
 
 const store = configureStore({
   reducer: {
-    // Define a top-level state field named `todos`, handled by `todosReducer`
     todos: todosReducer,
-    // filters: filtersReducer,
+    auth: authSlice,
+    feedback: feedbackSlice,
   },
 });
 

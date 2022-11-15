@@ -11,6 +11,14 @@ export function demo() {
   };
 }
 
+let count = 0;
+export function demoAddToDo() {
+  console.log("modify redux store clicked~! ", count);
+  return async function (dispatch) {
+    dispatch(todoAdded(count++));
+  };
+}
+
 export function updateTodo(data) {
   return async function (dispatch) {
     store.dispatch(todosLoading());
