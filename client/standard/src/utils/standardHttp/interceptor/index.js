@@ -42,10 +42,23 @@ const interceptor = (store) => {
         return Promise.reject(error);
       }
 
-      const errorStatus = error?.response?.status;
+      const errorResponse = error?.response;
 
-      // Retrieve a new access Token if UNAUTHORIZED error(401)
-      if (errorStatus === 401) {
+      console.log(
+        "WWW-Authenticate",
+        error?.response?.headers?.get("www-authenticate")
+      );
+      console.log("WWW-Authenticate tst", error?.response);
+
+      // Retrieve a new access Token if UNAUTHORIZED error(401) and `WWW-Authenticate` header
+      // is included
+      if (
+        errorResponse?.status === 401 &&
+        errorResponse?.headers?.get("www-authenticate")?.startsWith("Bearer ")
+      ) {
+        console.group("errorResponse === 401 && WWW-Authenticate Header");
+        console.log(config?.headers);
+        console.groupEnd();
         try {
           // Get a new Access Token
           const { data } = await refreshAccessToken();
@@ -82,9 +95,11 @@ const interceptor = (store) => {
 function logError(store, error) {
   if (error.response) {
     // Request made and server responded
+    console.group("error.response");
     console.log(error.response.data);
     console.log(error.response.status);
     console.log(error.response.headers);
+    console.groupEnd();
 
     // Trigger Feedback alert in the application
     store?.dispatch(
@@ -95,18 +110,22 @@ function logError(store, error) {
     );
   } else if (error.request) {
     // The request was made but no response was received
+    console.group("error.request");
     console.log(error);
+    console.groupEnd();
 
     store?.dispatch(
       newFeedBack({
         msg: error.message,
-        type: "danger"
+        type: "danger",
       })
     );
   } else {
     // Something happened in setting up the request that triggered an Error
+    console.group("Default error structure");
     console.log("Error ---> ", error);
     console.log("Error ---> ", error.message);
+    console.groupEnd();
 
     store?.dispatch(
       newFeedBack({

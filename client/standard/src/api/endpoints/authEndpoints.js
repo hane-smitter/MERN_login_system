@@ -1,0 +1,83 @@
+/* 
+- LOGIN : http://localhost:8000/api/login
+- METHOD : POST
+- Fields : email, password
+
+- SIGNUP : http://localhost:8000/api/signup
+- METHOD : POST
+- FIELDS : 
+
+- LOGOUT : http://localhost:8000/api/logout
+- METHOD : GET
+<-- Requires Authorization Header -->
+
+- REFRESHACCESSTOKEN : http://localhost:8000/api/reauth
+- METHOD : GET
+<-- Requires Authorization Header -->
+<-- Requires RefreshToken Cookie sent along -->
+
+- EMAIL PASSWORD RESET LINK : http://localhost:8000/api/forgotpass
+- METHOD : POST
+- FIELDS : email
+<-- Uses Origin header to create link to application -->
+
+- RESET PASSWORD : http://localhost:8000/api/resetpass/:resetToken
+- METHOD: PATCH
+*/
+
+import http from "../../utils/standardHttp";
+
+/**
+ * Login API endpoint
+ * @param {object} data - Account Credentials
+ * @param {string} data.email - Email used by the account
+ * @param {string} data.password - Password
+ * @returns {Promise} - Axios promise object
+ */
+export const login = (data) => http.post("/login", data);
+
+/**
+ * Signup API endpoint
+ * @param {object} data - Credentials to create account
+ * @param {string} data.firstName - Firstname
+ * @param {string} data.lastName - Lastname
+ * @param {string} data.email - Email
+ * @param {string} data.password - Password
+ * @returns {Promise} - Axios promise object
+ */
+export const signup = (data) => http.post("/signup", data);
+
+/**
+ * Refresh Token API endpoint
+ * @returns {Promise} - Axios promise object
+ */
+export const refreshAccessToken = () =>
+  http.get("/reauth", { withCredentials: true, requireAuthHeader: true });
+
+/**
+ * Logout API endpoint
+ * @returns {Promise} - No response body
+ */
+export const logout = () => http.get("/logout", { requireAuthHeader: true });
+
+/**
+ * Request password reset link API endpoint
+ * @param {object} data - Account Credentials
+ * @param {string} data.email - Email used by the account
+ * @returns {Promise} - Axios promise object
+ */
+export const forgotpass = (data) => http.post("/forgotpass", data);
+
+/**
+ * Reset password API endpoint
+ * @param {object} data - Account Credentials
+ * @param {string} data.resetToken - Reset Token
+ * @param {string} data.password - Password
+ * @param {string} data.passwordConfirm - Password Confirmation
+ * @returns {Promise} - Axios promise object
+ */
+export const resetpass = (data) => {
+  const { resetToken, password, passwordConfirm } = data;
+
+  return http.patch(`/resetpass/${resetToken}`, { password, passwordConfirm });
+};

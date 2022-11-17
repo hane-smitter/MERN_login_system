@@ -5,15 +5,13 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import image from "../../images/capital.jpg";
-import { demo, demoAddToDo } from "../../redux/dispatchers";
+import { demo, demo2, demoAddToDo } from "../../redux/dispatchers";
 
 function Home() {
   const dispatch = useDispatch();
 
   return (
     <Stack direction="horizontal" gap={2}>
-      <button onClick={() => dispatch(demo())}>Demo Click</button>
-      <button onClick={() => dispatch(demoAddToDo())}>Mod redux store</button>
       <div>
         <img
           src={image}
@@ -25,15 +23,20 @@ function Home() {
       </div>
       <div className="mx-auto">
         <h1 className="text-uppercase">Welcome !!</h1>
-        <p className="text-muted">
+        <p className="lead">
           Thank you for chosing <span className="fw-bold">Capital</span> to be
           your trusted service provider.
           <br />
-          <span className="fst-italic">Sign in to get started.</span>
+          <span className="fst-italic text-muted">Sign Up to get started.</span>
         </p>
         <div>
-          <Button as={Link} to="/login" className="text-uppercase fw-bolder">
-            Sign in
+          <Button
+            as={Link}
+            to="/signup"
+            className="text-uppercase fw-bolder"
+            variant="primary"
+          >
+            Sign Up
           </Button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = { user: {}, token: "" };
+const initialState = { user: {}, token: "", loading: false };
 
 const authSlice = createSlice({
   name: "auth",
@@ -18,9 +18,18 @@ const authSlice = createSlice({
         ...payload,
       };
     },
+    authLoading(state, action) {
+      const { payload } = action;
+      // Object.assign(state.loading, payload?.loading);
+      // state.loading = Boolean(payload?.loading);
+      return {
+        ...state,
+        loading: Boolean(payload?.loading),
+      };
+    },
   },
 });
 
-export const { todoAdded, todoToggled, todosLoading } = authSlice.actions;
+export const { addAuthToken, addAuthUser, authLoading } = authSlice.actions;
 
 export default authSlice.reducer;

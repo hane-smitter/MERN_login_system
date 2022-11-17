@@ -1,34 +1,48 @@
 // import { createAsyncThunk } from "@reduxjs/toolkit";
-import { login, refreshAccessToken } from "../../api";
-import { todoAdded, todosLoading } from "../reducers/todosSlice";
+import * as API from "../../api";
+import { addAuthUser, addAuthToken, authLoading } from "../reducers/authSlice";
 import store from "../store";
 
-export function demo() {
+export function login(data, cb) {
+  return async function (dispatch) {
+    try {
+      dispatch(authLoading({ loading: true }));
+      const response = await API.login(data);
+      console.log({ response });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      console.log("authLoading(false):: ", authLoading({ loading: false }));
+      dispatch(authLoading({ loading: false }));
+      if (cb) {
+        cb();
+      }
+    }
+  };
+}
+
+export function signup(data) {
+  return async function (dispatch) {
+    try {
+      dispatch(authLoading({ loading: true }));
+      const response = await API.signup(data);
+      console.log({ response });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      console.log("authLoading(false):: ", authLoading({ loading: false }));
+      dispatch(authLoading({ loading: false }));
+    }
+  };
+}
+
+export function refreshAccessToken() {
   return async function () {
-    const response = await login();
-
-    console.log("Demmo action after fired!!");
+    try {
+      const response = await API.refreshAccessToken();
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
-}
-
-let count = 0;
-export function demoAddToDo() {
-  console.log("modify redux store clicked~! ", count);
-  return async function (dispatch) {
-    dispatch(todoAdded(count++));
-  };
-}
-
-export function updateTodo(data) {
-  return async function (dispatch) {
-    store.dispatch(todosLoading());
-
-    const response = `await client.post("/fakeApi/todos", { data })`;
-
-    store.dispatch(todoAdded(response));
-  };
-  //   return createAsyncThunk("todoToggled", async () => {
-  //     const response = await client.post("/fakeApi/todos", { data });
-  //     return response.todos;
-  //   });
 }

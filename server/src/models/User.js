@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
 
-const CustomError = require("../errors/customErrorConstructor");
+const CustomError = require("../config/error/customErrorConstructor");
 
 // ENV Vars
 const ACCESS_TOKEN = {
@@ -55,9 +55,11 @@ UserSchema.pre("save", async function (next) {
 
 UserSchema.statics.findByCredentials = async (email, password) => {
   const user = await UserModel.findOne({ email });
-  if (!user) throw new CustomError("Wrong credentials!", 401);
+  if (!user)
+    throw new CustomError("Wrong credentials!", 401, "Wrong credentials!");
   const passwdMatch = await bcrypt.compare(password, user.password);
-  if (!passwdMatch) throw new CustomError("Wrong credentials!!", 401);
+  if (!passwdMatch)
+    throw new CustomError("Wrong credentials!!", 401, "Wrong credentials!!");
   return user;
 };
 

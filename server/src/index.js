@@ -1,16 +1,29 @@
 require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 const { db } = require("./dbConn/mongoose/mongoose.js");
 const router = require("./routes/routes.js");
 const {
   AppErrorHandler,
   LostErrorHandler,
-} = require("./errors/errorHandler.js");
+} = require("./config/exceptions/errorHandler.js");
+const corsOptions = require("./config/cors/cors.js");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+
+// Enable Cross Origin Resource Sharing
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  /* console.log("-----REQ.headers-----");
+  console.log(req.headers);
+  console.log("-----RES.headers-----");
+  console.log(res.getHeaderNames()); */
+  // res.headersSent
+  next();
+});
 
 // Parse requests with Content-Type application/json
 // so that data is available on req body

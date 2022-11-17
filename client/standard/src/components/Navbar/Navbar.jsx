@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 
 function NavBar() {
@@ -12,7 +13,7 @@ function NavBar() {
       expand="lg"
       bg="light"
       variant="light"
-      className="px-2 mb-2"
+      className="px-2 mb-2 justify-content-between"
     >
       <Navbar.Brand as={Link} to="/">
         Capital
@@ -40,7 +41,16 @@ function NavBar() {
             </Nav>
           </Navbar.Collapse>
         </React.Fragment>
-      ) : null}
+      ) : (
+        <Button
+          as={Link}
+          to="/login"
+          className="text-uppercase fw-bolder"
+          variant="outline-dark"
+        >
+          Sign in
+        </Button>
+      )}
     </Navbar>
   );
 }

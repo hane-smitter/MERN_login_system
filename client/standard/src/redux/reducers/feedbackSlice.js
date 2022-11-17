@@ -1,15 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 function typeOfStatusCode(statusCode) {
-  switch (statusCode) {
-    case statusCode >= 200 && statusCode <= 299:
-      return "success";
-
-    case statusCode >= 400 && statusCode <= 599:
-      return "danger";
-
-    default:
-      return "info";
+  if (statusCode >= 400 && statusCode <= 599) {
+    return "danger";
+  } else if (statusCode >= 200 && statusCode <= 299) {
+    return "success";
+  } else {
+    return "info";
   }
 }
 

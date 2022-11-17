@@ -12,7 +12,7 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
 
-const CustomError = require("../errors/customErrorConstructor");
+const CustomError = require("../config/error/customErrorConstructor");
 const User = require("../models/User");
 const { sendEmail } = require("../services/email/sendEmail");
 
@@ -34,6 +34,10 @@ const REFRESH_TOKEN_COOKIE = {
   },
 };
 
+const ACCESS_TOKEN = {
+  secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
+};
+
 /* 
 For this tutorial, we'll be using the popular express-validator
 module to perform both validation and sanitization of our form data.
@@ -42,19 +46,42 @@ module to perform both validation and sanitization of our form data.
 /* REGENERATE NEW ACCESS TOKEN */
 // - This route will require authorization header,
 // so the header can be removed from DB if it is expired
+
+/* 
+- Check if Refresh Cookie is provided in the cookies.
+- Check if Access Token is provided in the Authorization Header.
+- `jwt.verify()` the Access Token:
+    - If Access Token is invalid, throw a `CustomError`.
+    - Check if _id of decoded Access Token User exists and has the `expiredAccessToken`.
+- `jwt.verify()` the Refresh Token:
+    - If Refresh Token is invalid, throw a `CustomError`.
+    - If Expired or Not, remove Received Access Token from DB record of associated user.
+- Check if the provided token is in the database record of its associated user.
+*/
 module.exports.refreshAccessToken = async (req, res, next) => {
   try {
     const cookies = req.cookies;
-    const authHeader = req.headers["authorization"];
+    const authHeader = req.header("Authorization");
+    console.log("Auth Header", authHeader);
     if (!cookies[REFRESH_TOKEN_COOKIE.name])
-      throw new CustomError("Refresh Token is missing!", 422);
-    if (!authHeader?.startsWith("Bearer "))
-      throw new CustomError("Invalid Access Token!", 422);
+      throw new CustomError("Refresh Token is missing!", 401, "Unauthorized");
+    if (!authHeader?.startsWith("Bearer ")) {
+      throw new CustomError("Invalid Access Token!", 401, "Unauthorized!");
+    }
 
     const accessTokenParts = authHeader.split(" ");
     const expiredAccessTkn = accessTokenParts[1];
 
-    if (!expiredAccessTkn) throw new CustomError("Invalid Access Token!", 422);
+    // Verify if expiredAccessTkn is a valid token
+    jwt.verify(expiredAccessTkn, ACCESS_TOKEN.secret, {
+      ignoreExpiration: true,
+    });
+
+    // console.log("An Expired Tkn. Removing from DB...");
+    // userWithExpiredTkn.tokens = userWithExpiredTkn.tokens.filter(
+    //   (tknObj) => tknObj.token !== expiredAccessTkn
+    // );
+    // await userWithExpiredTkn.save();
 
     const rfTkn = cookies[REFRESH_TOKEN_COOKIE.name];
 
@@ -62,18 +89,28 @@ module.exports.refreshAccessToken = async (req, res, next) => {
     // and decoding to get id of represented user
     const decoded = jwt.verify(rfTkn, REFRESH_TOKEN_COOKIE.secret);
 
-    const user = await User.findById(decoded._id);
+    // const user = await User.findById(decoded._id);
+    const userWithRefreshTkn = await User.findOne({
+      _id: decoded._id,
+      "tokens.token": expiredAccessTkn,
+    });
+    if (!userWithRefreshTkn) {
+      throw new CustomError("Invalid Access Token!", 401, "Unauthorized!");
+    }
     // Delete the expired token
-    user.tokens = user.tokens.filter(
+    console.log("Removing Expired Tkn from DB in refresh handler...");
+    userWithRefreshTkn.tokens = userWithRefreshTkn.tokens.filter(
       (tokenObj) => tokenObj.token !== expiredAccessTkn
     );
-    await user.save();
+    await userWithRefreshTkn.save();
 
     //GENERATE NEW ACCESSTOKEN
-    const accessToken = await user.generateAcessToken();
+    const accessToken = await userWithRefreshTkn.generateAcessToken();
 
     // Send back new created accessToken
-    res.status(201).json({
+    res.status(201);
+    res.set({ "Cache-Control": "no-store", Pragma: "no-cache" });
+    res.json({
       success: true,
       accessToken,
     });
@@ -88,7 +125,7 @@ module.exports.signup = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      throw new CustomError(errors.array(), 422);
+      throw new CustomError(errors.array(), 422, errors.array()[0]?.msg);
     }
 
     const { firstName, lastName, email, password } = req.body;
@@ -128,11 +165,12 @@ module.exports.login = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      throw new CustomError(errors.array(), 422);
+      throw new CustomError(errors.array(), 422, errors.array()[0]?.msg);
     }
 
     const { email, password } = req.body;
 
+    // If user is not found, an error is thrown
     const user = await User.findByCredentials(email, password);
 
     // Create Access Token
