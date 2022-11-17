@@ -21,9 +21,9 @@ const RESET_PASSWORD_TOKEN = {
   expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
 };
 
-const REFRESH_TOKEN_COOKIE = {
-  name: "refreshTkn",
+const REFRESH_TOKEN = {
   secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
+  cookieName: "refreshTkn",
   // Article explaining cookies samesite vividly: https://web.dev/samesite-cookies-explained/
   cookieOptions: {
     // With samesite `None` MUST also specify `secure: true`
@@ -52,18 +52,18 @@ module to perform both validation and sanitization of our form data.
 - Check if Access Token is provided in the Authorization Header.
 - `jwt.verify()` the Access Token:
     - If Access Token is invalid, throw a `CustomError`.
-    - Check if _id of decoded Access Token User exists and has the `expiredAccessToken`.
 - `jwt.verify()` the Refresh Token:
     - If Refresh Token is invalid, throw a `CustomError`.
+    - Check if _id of decoded Refresh Token User exists and has the `expiredAccessToken`.
     - If Expired or Not, remove Received Access Token from DB record of associated user.
-- Check if the provided token is in the database record of its associated user.
+- Generate a New Access Token and store it in the DB record of user that is currently authenticating.
 */
 module.exports.refreshAccessToken = async (req, res, next) => {
   try {
     const cookies = req.cookies;
     const authHeader = req.header("Authorization");
     console.log("Auth Header", authHeader);
-    if (!cookies[REFRESH_TOKEN_COOKIE.name])
+    if (!cookies[REFRESH_TOKEN.cookieName])
       throw new CustomError("Refresh Token is missing!", 401, "Unauthorized");
     if (!authHeader?.startsWith("Bearer ")) {
       throw new CustomError("Invalid Access Token!", 401, "Unauthorized!");
@@ -77,25 +77,22 @@ module.exports.refreshAccessToken = async (req, res, next) => {
       ignoreExpiration: true,
     });
 
-    // console.log("An Expired Tkn. Removing from DB...");
-    // userWithExpiredTkn.tokens = userWithExpiredTkn.tokens.filter(
-    //   (tknObj) => tknObj.token !== expiredAccessTkn
-    // );
-    // await userWithExpiredTkn.save();
-
-    const rfTkn = cookies[REFRESH_TOKEN_COOKIE.name];
+    const rfTkn = cookies[REFRESH_TOKEN.cookieName];
 
     // Verifying the Refresh Token
     // and decoding to get id of represented user
-    const decoded = jwt.verify(rfTkn, REFRESH_TOKEN_COOKIE.secret);
+    const decodedRefreshTkn = jwt.verify(rfTkn, REFRESH_TOKEN.secret);
 
-    // const user = await User.findById(decoded._id);
+    // Find user by ID gotten from refresh token in the DB
+    // whose record has the `expired access token` listed
+    // which we are ensuring the `expired access token` received in this endpoint
+    // was assigned to this user that wants to get new token
     const userWithRefreshTkn = await User.findOne({
-      _id: decoded._id,
+      _id: decodedRefreshTkn._id,
       "tokens.token": expiredAccessTkn,
     });
     if (!userWithRefreshTkn) {
-      throw new CustomError("Invalid Access Token!", 401, "Unauthorized!");
+      throw new CustomError("Access Token Identity Mismatch!", 401, "Unauthorized!");
     }
     // Delete the expired token
     console.log("Removing Expired Tkn from DB in refresh handler...");
@@ -104,7 +101,7 @@ module.exports.refreshAccessToken = async (req, res, next) => {
     );
     await userWithRefreshTkn.save();
 
-    //GENERATE NEW ACCESSTOKEN
+    // GENERATE NEW ACCESSTOKEN -- it is also saved in DB
     const accessToken = await userWithRefreshTkn.generateAcessToken();
 
     // Send back new created accessToken
@@ -143,9 +140,9 @@ module.exports.signup = async (req, res, next) => {
 
     // SET refresh Token in cookie
     res.cookie(
-      REFRESH_TOKEN_COOKIE.name,
+      REFRESH_TOKEN.cookieName,
       refreshToken,
-      REFRESH_TOKEN_COOKIE.cookieOptions
+      REFRESH_TOKEN.cookieOptions
     );
 
     // Send Response on successful Login
@@ -181,9 +178,9 @@ module.exports.login = async (req, res, next) => {
 
     // SET refresh Token in cookie
     res.cookie(
-      REFRESH_TOKEN_COOKIE.name,
+      REFRESH_TOKEN.cookieName,
       refreshToken,
-      REFRESH_TOKEN_COOKIE.cookieOptions
+      REFRESH_TOKEN.cookieOptions
     );
 
     // Send Response on successful Login
@@ -216,11 +213,11 @@ module.exports.logout = async (req, res, next) => {
     // But express converts the option `maxAge` to `expires`.
     const expireCookieOptions = Object.assign(
       {},
-      REFRESH_TOKEN_COOKIE.cookieOptions,
+      REFRESH_TOKEN.cookieOptions,
       { maxAge: 0 }
     );
     // Clear the refresh token cookie
-    res.cookie(REFRESH_TOKEN_COOKIE.name, "", expireCookieOptions);
+    res.cookie(REFRESH_TOKEN.cookieName, "", expireCookieOptions);
     res.status(205).json({
       success: true,
     });

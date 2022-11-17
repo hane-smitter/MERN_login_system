@@ -62,11 +62,11 @@ UserSchema.statics.findByCredentials = async (email, password) => {
     throw new CustomError("Wrong credentials!!", 401, "Wrong credentials!!");
   return user;
 };
-
+// Generates Access token and saves it in the DB before returning it
 UserSchema.methods.generateAcessToken = async function () {
   const accessToken = jwt.sign(
     {
-      _id: this._id,
+      _id: this._id.toString(),
       fullName: `${this.firstName} ${this.lastName}`,
       email: this.email,
     },
