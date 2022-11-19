@@ -11,10 +11,11 @@
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
+const AutorizationError = require("../../config/error/AuthorizationErrorConstructor");
 
-const CustomError = require("../config/error/customErrorConstructor");
-const User = require("../models/User");
-const { sendEmail } = require("../services/email/sendEmail");
+const CustomError = require("../../config/error/customErrorConstructor");
+const User = require("../../models/User");
+const { sendEmail } = require("../../services/email/sendEmail");
 
 const RESET_PASSWORD_TOKEN = {
   secret: process.env.RESET_PASSWORD_TOKEN_SECRET,
@@ -76,9 +77,13 @@ module.exports.refreshAccessToken = async (req, res, next) => {
     const expiredAccessTkn = accessTokenParts[1];
 
     // Verify if expiredAccessTkn is a valid token
-    jwt.verify(expiredAccessTkn, ACCESS_TOKEN.secret, {
-      ignoreExpiration: true,
-    });
+    const decodedExpiredAccessTkn = jwt.verify(
+      expiredAccessTkn,
+      ACCESS_TOKEN.secret,
+      {
+        ignoreExpiration: true,
+      }
+    );
 
     const rfTkn = cookies[REFRESH_TOKEN.cookieName];
 
@@ -95,9 +100,9 @@ module.exports.refreshAccessToken = async (req, res, next) => {
       "tokens.token": expiredAccessTkn,
     });
     console.log("decodedRefreshTkn: ", decodedRefreshTkn);
-    console.log("expiredAccessTkn: ", expiredAccessTkn);
+    console.log("expiredAccessTkn: ", decodedExpiredAccessTkn);
     console.log("userWithRefreshTkn: ", userWithRefreshTkn);
-    
+
     if (!userWithRefreshTkn) {
       throw new CustomError(
         "Access Token Identity Mismatch!",
@@ -111,6 +116,7 @@ module.exports.refreshAccessToken = async (req, res, next) => {
       (tokenObj) => tokenObj.token !== expiredAccessTkn
     );
     await userWithRefreshTkn.save();
+    console.log("...Tkn removED!");
 
     // GENERATE NEW ACCESSTOKEN -- it is also saved in DB
     const accessToken = await userWithRefreshTkn.generateAcessToken();
@@ -124,6 +130,11 @@ module.exports.refreshAccessToken = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
+    if (err?.name === "JsonWebTokenError") {
+      return next(
+        new AutorizationError(err, "", { error_desc: "missing token" })
+      );
+    }
     next(err);
   }
 };

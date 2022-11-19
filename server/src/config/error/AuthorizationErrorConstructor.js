@@ -1,15 +1,14 @@
 const CustomError = require("./customErrorConstructor");
 
-class AutorizationError extends CustomError {
+class AuthorizationError extends CustomError {
   /**
-   * Custom Error Constructor with additional methods
+   * Authorization Error Constructor(fixed to status code `401`)
    * @param {any} [message] - Optional error payload
-   * @param {number} [statusCode] - Optional error http status code
    * @param {string} [feedback=""] - Optional feedback message you want to provide
    * @param {object} [authParams] - Authorization Parameters to set in `WWW-Authenticate` header
    */
-  constructor(message, statusCode, feedback, authParams = { realm: "app" }) {
-    super(message, statusCode, feedback);
+  constructor(message, feedback, authParams = {}) {
+    super(message, 401, feedback);
     this.authorizationError = true;
     this.authParams = authParams;
     this.authHeaders = {
@@ -20,20 +19,21 @@ class AutorizationError extends CustomError {
   #stringifyAuthParams() {
     let str = "";
 
-    const { realm, ...others } = this.authParams;
+    let { realm, ...others } = this.authParams;
 
-    if (realm) {
-      // Delete other `realms` if they exist
-      Object.keys(others).forEach((authParam) => {
-        if (authParam.toLowerCase() === "realm") {
-          delete others[authParam];
-        }
-      });
-    }
+    realm = realm ? realm : "app.com";
 
     str = `realm=${realm}`;
 
-    Object.keys(others).forEach((authParam, index, array) => {
+    const otherParams = Object.keys(others);
+    if (otherParams.length < 1) return str;
+
+    otherParams.forEach((authParam, index, array) => {
+      // Delete other `realms` if they exist
+      if (authParam.toLowerCase() === "realm") {
+        delete others[authParam];
+      }
+
       let comma = ",";
       if (array.length - 1 === index) {
         comma = "";
@@ -41,10 +41,10 @@ class AutorizationError extends CustomError {
       str = str + `,${authParam}=${this.authParams[authParam]}${comma}`;
     });
 
-    console.log("Authenticate header string returned: ", str);
+    console.log("--Authenticate header string returned: -- ", str);
 
     return str;
   }
 }
 
-module.exports = AutorizationError;
+module.exports = AuthorizationError;

@@ -7,9 +7,10 @@ const {
   logout,
   resetPassword,
   forgotPassword,
-} = require("../controllers/auth");
+} = require("../controllers/user/auth");
+const { fetchUserProfile } = require("../controllers/user/user");
 const { authCheck } = require("../middlewares/authCheck");
-const validators = require("../validator/form-validator");
+const validators = require("../validator");
 
 const router = express.Router();
 
@@ -53,21 +54,29 @@ router.get("/reauth", refreshAccessToken);
  * @param - /api/forgotpass
  * @description - Send password reset email link
  */
-router.post(
-  "/forgotpass",
-  validators.forgotPasswordValidator,
-  forgotPassword
-);
+router.post("/forgotpass", validators.forgotPasswordValidator, forgotPassword);
 
 /**
  * @method - POST
  * @param - /api/resetpass
  * @description - Reset password
  */
- router.patch(
+router.patch(
   "/resetpass/:resetToken",
   validators.resetPasswordValidator,
   resetPassword
+);
+
+/**
+ * @method - GET
+ * @param - /u/:id
+ * @description - Fetch user profile
+ */
+router.get(
+  "/u/:id",
+  authCheck,
+  validators.fetchUserProfileValidator,
+  fetchUserProfile
 );
 
 module.exports = router;

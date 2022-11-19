@@ -1,4 +1,5 @@
 import http from "..";
+import axios from "axios";
 import { refreshAccessToken } from "../../../api";
 import { newFeedBack } from "../../../redux/reducers/feedbackSlice";
 import { browserStorage } from "../../browserStorage";
@@ -7,7 +8,6 @@ const interceptor = (store) => {
   // Request interceptor
   http.interceptors.request.use(
     (config) => {
-      console.log("config in request Interceptor : ", config);
       if (config.requireAuthHeader) {
         const token = browserStorage.authTkn;
         config.headers.Authorization = `Bearer ${token}`;
@@ -21,78 +21,86 @@ const interceptor = (store) => {
     }
   );
 
-  // Response interceptor
-  http.interceptors.response.use(
-    (response) => {
-      // console.group("success happend");
-      // console.log(response);
-      // console.groupEnd();
-      // const feedbackInfo = response?.data?.status?.info;
-      // const feedback = feedbackInfo?.message;
-      // const feedbackSeverity = feedbackInfo?.severity;
-      // Boolean(feedback) &&
-      //   NotificationService.notify(feedback, feedbackSeverity);
-      return response;
-    },
-    async (error) => {
-      const config = new Object(error.config); // Ensuring this value is an Object even when it is undefined
-      const errorResponse = error?.response;
-      const numberOfRetries = config?.__retryCount || 0;
+  // We write the response interceptor inside a function
+  // so that we may reference to it
+  function registerResponseInterceptor() {
+    // Response interceptor
+    const responseInterceptor = http.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      async (error) => {
+        console.log("RESPONSE INTERCEPTOR RUNNING!!");
+        const config = error.config; // Ensuring this value is an Object even when it is undefined
+        const errorResponse = error?.response;
 
-      config.__retryCount = numberOfRetries;
-      console.log("numberOfRetries: ", config?.__retryCount);
+        if (
+          errorResponse?.status === 401 &&
+          errorResponse?.headers?.get("www-authenticate")?.startsWith("Bearer ")
+        ) {
+          let retry = 0;
 
-      if (numberOfRetries >= 3) {
+          // Detach the response interceptors temporarily
+          http.interceptors.response.eject(responseInterceptor);
+
+          try {
+            // Increment the retry count of attempts to fetch this resource
+            retry += 1;
+
+            console.group("errorResponse === 401 && WWW-Authenticate Header");
+            console.log("AUTO REFRESH A-T ATTEPT : ", retry);
+            // console.log(config?.headers);
+            console.groupEnd();
+
+            // Get a new Access Token
+            console.log("Getting A New Access Token...");
+
+            const { data } = await refreshAccessToken();
+            const newAccessToken = data?.accessToken;
+            console.log(
+              "NEW A-T FROM AXIOS Interceptor",
+              `...${newAccessToken
+                .toString()
+                .substring(newAccessToken.length - 20)}`
+            );
+            config.headers.Authorization = `Bearer ${newAccessToken}`;
+
+            // Attach back interceptor
+            registerResponseInterceptor();
+
+            // Fetch the Initial resource again
+            return http({ ...config, headers: config.headers.toJSON() });
+          } catch (reauthError) {
+            // Create recursion(loop)
+            // if (retry < 1) {
+            //   return getNewAccessToken();
+            // }
+
+            console.log("reauthError -- ", reauthError);
+            // Attach back interceptor
+            registerResponseInterceptor();
+            // We are rejecting with Error from initial Request
+            // return Promise.reject(error);
+            logError(error, store);
+            return Promise.reject(error);
+          }
+
+          // await getNewAccessToken();
+        }
+
+        logError(error, store);
+
         return Promise.reject(error);
       }
-
-      // console.log(
-      //   "WWW-Authenticate",
-      //   error?.response?.headers?.get("www-authenticate")
-      // );
-      // console.log("WWW-Authenticate tst", error?.response);
-
-      // Retrieve a new access Token if UNAUTHORIZED error(401) and `WWW-Authenticate` header
-      // is included
-      if (
-        errorResponse?.status === 401 &&
-        errorResponse?.headers?.get("www-authenticate")?.startsWith("Bearer ")
-      ) {
-        console.group("errorResponse === 401 && WWW-Authenticate Header");
-        console.log(config?.headers);
-        console.groupEnd();
-        try {
-          // Get a new Access Token
-          const { data } = await refreshAccessToken();
-          const newAccessToken = data?.status?.payload?.token;
-          console.log(
-            "NEW AT FROM AXIOS Interceptor",
-            `...${newAccessToken
-              .toString()
-              .substring(newAccessToken.length - 20)}`
-          );
-          config.headers.Authorization = `Bearer ${newAccessToken}`;
-
-          // Increment the retry count of attempts to fetch this resource
-          config.__retryCount += 1;
-          // Fetch resource again
-          return http(config);
-        } catch (error) {
-          return Promise.reject(error);
-        }
-      }
-
-      logError(error, store);
-
-      return Promise.reject(error);
-    }
-  );
+    );
+  }
+  registerResponseInterceptor();
 };
 
 /**
  * Axios Error Handler
- * @param {Object} store - Redux Store
  * @param {Error} error - Error object
+ * @param {Object} store - Redux Store
  */
 function logError(error, store) {
   if (error.response) {
@@ -132,7 +140,7 @@ function logError(error, store) {
     store?.dispatch(
       newFeedBack({
         // type: "",
-        msg: error.message,
+        msg: "Oops! An Error Occured!",
       })
     );
   }

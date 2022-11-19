@@ -51,7 +51,8 @@ export const login = (data) => {
  * @param {string} data.password - Password
  * @returns {Promise} - Axios promise object
  */
-export const signup = (data) => http.post("/signup", data);
+export const signup = (data) =>
+  http.post("/signup", data, { withCredentials: true });
 
 let refreshAccessTokenController;
 /**

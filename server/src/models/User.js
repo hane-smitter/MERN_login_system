@@ -37,6 +37,15 @@ const UserSchema = new User({
   resetpasswordtoken: String,
   resetpasswordtokenexpiry: Date,
 });
+UserSchema.set("toJSON", {
+  virtuals: true,
+  transform: function (doc, ret, options) {
+    // remove the property(s) of every document before returning the result
+    delete ret.password;
+    delete ret.tokens;
+    return ret;
+  },
+});
 
 UserSchema.pre("save", async function (next) {
   try {

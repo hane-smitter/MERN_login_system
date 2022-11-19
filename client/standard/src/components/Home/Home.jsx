@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import image from "../../images/capital.jpg";
-import { demo, demo2, demoAddToDo } from "../../redux/dispatchers";
+import { logout } from "../../redux/dispatchers";
 
 function Home() {
   const dispatch = useDispatch();
@@ -13,6 +13,7 @@ function Home() {
   return (
     <Stack direction="horizontal" gap={2}>
       <div>
+        <button onClick={() => dispatch(logout())}>trigger logout</button>
         <img
           src={image}
           alt="banner"

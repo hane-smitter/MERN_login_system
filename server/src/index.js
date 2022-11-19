@@ -1,10 +1,7 @@
 require("dotenv").config();
-const fs = require("fs");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const https = require("https");
-const http = require("http");
 
 const { db } = require("./dbConn/mongoose/mongoose.js");
 const router = require("./routes/routes.js");
