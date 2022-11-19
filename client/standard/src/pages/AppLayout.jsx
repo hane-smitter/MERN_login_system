@@ -1,4 +1,3 @@
-import React from "react";
 import { Outlet } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 
@@ -9,6 +8,7 @@ function AppLayout() {
   return (
     <Container fluid="md">
       <NavBar />
+      {/* Component that reports to user Errors encountered */}
       <AppFeedback />
       <Outlet />
     </Container>

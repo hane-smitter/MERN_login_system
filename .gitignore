@@ -24,6 +24,7 @@ yarn-error.log*
 
 # Temporary backup files
 *.bak
+*.pem
 
 # Environment Variables
 *.env

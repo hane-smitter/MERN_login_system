@@ -27,6 +27,7 @@
 
 import http from "../../utils/standardHttp";
 
+let loginController;
 /**
  * Login API endpoint
  * @param {object} data - Account Credentials
@@ -34,7 +35,12 @@ import http from "../../utils/standardHttp";
  * @param {string} data.password - Password
  * @returns {Promise} - Axios promise object
  */
-export const login = (data) => http.post("/login", data);
+export const login = (data) => {
+  loginController?.abort();
+  loginController = new AbortController();
+  const signal = loginController.signal;
+  return http.post("/login", data, { withCredentials: true, signal });
+};
 
 /**
  * Signup API endpoint
@@ -47,12 +53,22 @@ export const login = (data) => http.post("/login", data);
  */
 export const signup = (data) => http.post("/signup", data);
 
+let refreshAccessTokenController;
 /**
  * Refresh Token API endpoint
  * @returns {Promise} - Axios promise object
  */
-export const refreshAccessToken = () =>
-  http.get("/reauth", { withCredentials: true, requireAuthHeader: true });
+export const refreshAccessToken = () => {
+  refreshAccessTokenController?.abort();
+  refreshAccessTokenController = new AbortController();
+  const signal = refreshAccessTokenController.signal;
+
+  return http.get("/reauth", {
+    withCredentials: true,
+    requireAuthHeader: true,
+    signal,
+  });
+};
 
 /**
  * Logout API endpoint

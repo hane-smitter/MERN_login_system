@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +10,21 @@ import { login } from "../redux/dispatchers";
 
 function Login() {
   const dispatch = useDispatch();
-  const loginLoading = useSelector(({ auth }) => auth.loading);
+  const { user_loading: loginLoading, user } = useSelector(({ auth }) => auth);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const redirectedFrom = location?.state?.comingFrom;
+  const GOTO = redirectedFrom
+    ? `${redirectedFrom?.pathname}${redirectedFrom?.search}`
+    : "/home";
+
+  // useEffect(() => {
+  //   if (Object.keys(user).length > 0) {
+  //     console.log("Navigating to: ", GOTO);
+  //     navigate({ to: GOTO });
+  //   }
+  // }, [user]);
 
   const formik = useFormik({
     initialValues: {
@@ -29,7 +44,7 @@ function Login() {
   return (
     <div style={{ maxWidth: 500, marginInline: "auto" }}>
       <h2 className="mb-3">Login to your account</h2>
-      
+
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Email address</Form.Label>

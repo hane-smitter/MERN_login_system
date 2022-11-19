@@ -1,21 +1,22 @@
 import http from "..";
 import { refreshAccessToken } from "../../../api";
 import { newFeedBack } from "../../../redux/reducers/feedbackSlice";
+import { browserStorage } from "../../browserStorage";
 
 const interceptor = (store) => {
   // Request interceptor
   http.interceptors.request.use(
     (config) => {
-      console.log("store.getState() : ", store.getState());
+      console.log("config in request Interceptor : ", config);
       if (config.requireAuthHeader) {
-        const token = store.getState().auth.token;
+        const token = browserStorage.authTkn;
         config.headers.Authorization = `Bearer ${token}`;
         delete config.requireAuthHeader;
       }
       return config;
     },
     (error) => {
-      logError(store, error);
+      logError(error, store);
       return Promise.reject(error);
     }
   );
@@ -34,21 +35,22 @@ const interceptor = (store) => {
       return response;
     },
     async (error) => {
-      const config = error.config;
-      config.__retryCount = config.__retryCount || 0;
-      console.log("__retry count", config.__retryCount);
+      const config = new Object(error.config); // Ensuring this value is an Object even when it is undefined
+      const errorResponse = error?.response;
+      const numberOfRetries = config?.__retryCount || 0;
 
-      if (config.__retryCount >= 3) {
+      config.__retryCount = numberOfRetries;
+      console.log("numberOfRetries: ", config?.__retryCount);
+
+      if (numberOfRetries >= 3) {
         return Promise.reject(error);
       }
 
-      const errorResponse = error?.response;
-
-      console.log(
-        "WWW-Authenticate",
-        error?.response?.headers?.get("www-authenticate")
-      );
-      console.log("WWW-Authenticate tst", error?.response);
+      // console.log(
+      //   "WWW-Authenticate",
+      //   error?.response?.headers?.get("www-authenticate")
+      // );
+      // console.log("WWW-Authenticate tst", error?.response);
 
       // Retrieve a new access Token if UNAUTHORIZED error(401) and `WWW-Authenticate` header
       // is included
@@ -80,7 +82,7 @@ const interceptor = (store) => {
         }
       }
 
-      logError(store, error);
+      logError(error, store);
 
       return Promise.reject(error);
     }
@@ -92,7 +94,7 @@ const interceptor = (store) => {
  * @param {Object} store - Redux Store
  * @param {Error} error - Error object
  */
-function logError(store, error) {
+function logError(error, store) {
   if (error.response) {
     // Request made and server responded
     console.group("error.response");

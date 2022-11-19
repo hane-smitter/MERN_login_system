@@ -28,8 +28,8 @@ const REFRESH_TOKEN = {
   cookieOptions: {
     // With samesite `None` MUST also specify `secure: true`
     httpOnly: false, // Cookie won't be accessible by Javascript `document.cookie`
-    sameSite: "Lax", // Lets servers specify whether/when cookies are sent with cross-site requests
-    secure: false, // A cookie with the Secure attribute is only sent to the server with an encrypted request over the HTTPS protocol
+    sameSite: "None", // Lets servers specify whether/when cookies are sent with cross-site requests
+    secure: true, // A cookie with the Secure attribute is only sent to the server with an encrypted request over the HTTPS protocol
     maxAge: 24 * 60 * 60 * 1000, // Age of cookie to expire in user-agent/client device
   },
 };
@@ -62,7 +62,10 @@ module.exports.refreshAccessToken = async (req, res, next) => {
   try {
     const cookies = req.cookies;
     const authHeader = req.header("Authorization");
-    console.log("Auth Header", authHeader);
+
+    console.log("Cookiez -> ", cookies);
+    console.log("Auth Header -> ", authHeader);
+
     if (!cookies[REFRESH_TOKEN.cookieName])
       throw new CustomError("Refresh Token is missing!", 401, "Unauthorized");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -91,8 +94,16 @@ module.exports.refreshAccessToken = async (req, res, next) => {
       _id: decodedRefreshTkn._id,
       "tokens.token": expiredAccessTkn,
     });
+    console.log("decodedRefreshTkn: ", decodedRefreshTkn);
+    console.log("expiredAccessTkn: ", expiredAccessTkn);
+    console.log("userWithRefreshTkn: ", userWithRefreshTkn);
+    
     if (!userWithRefreshTkn) {
-      throw new CustomError("Access Token Identity Mismatch!", 401, "Unauthorized!");
+      throw new CustomError(
+        "Access Token Identity Mismatch!",
+        401,
+        "Unauthorized!"
+      );
     }
     // Delete the expired token
     console.log("Removing Expired Tkn from DB in refresh handler...");
@@ -211,11 +222,9 @@ module.exports.logout = async (req, res, next) => {
     // Expire the refresh token
     // `max-age` takes precedence over `expires` if both are stated in cookie options.
     // But express converts the option `maxAge` to `expires`.
-    const expireCookieOptions = Object.assign(
-      {},
-      REFRESH_TOKEN.cookieOptions,
-      { maxAge: 0 }
-    );
+    const expireCookieOptions = Object.assign({}, REFRESH_TOKEN.cookieOptions, {
+      maxAge: 0,
+    });
     // Clear the refresh token cookie
     res.cookie(REFRESH_TOKEN.cookieName, "", expireCookieOptions);
     res.status(205).json({

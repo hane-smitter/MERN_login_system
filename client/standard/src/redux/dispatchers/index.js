@@ -1,22 +1,27 @@
-// import { createAsyncThunk } from "@reduxjs/toolkit";
+import jwt_decode from "jwt-decode";
 import * as API from "../../api";
-import { addAuthUser, addAuthToken, authLoading } from "../reducers/authSlice";
-import store from "../store";
+import {
+  addAuthUser,
+  addAuthToken,
+  authTokenLoading,
+  authUserLoading,
+} from "../reducers/authSlice";
 
-export function login(data, cb) {
+export function login(data) {
   return async function (dispatch) {
     try {
-      dispatch(authLoading({ loading: true }));
+      dispatch(authUserLoading({ loading: true }));
       const response = await API.login(data);
-      console.log({ response });
+
+      const user = jwt_decode(response.data?.accessToken);
+      dispatch(addAuthUser(user));
+      dispatch(addAuthToken({ token: response.data?.accessToken }));
+
+      console.log("---LOGIN SUCCESS---: ", response.data);
     } catch (error) {
       console.log(error);
     } finally {
-      console.log("authLoading(false):: ", authLoading({ loading: false }));
-      dispatch(authLoading({ loading: false }));
-      if (cb) {
-        cb();
-      }
+      dispatch(authUserLoading({ loading: false }));
     }
   };
 }
@@ -24,25 +29,37 @@ export function login(data, cb) {
 export function signup(data) {
   return async function (dispatch) {
     try {
-      dispatch(authLoading({ loading: true }));
+      dispatch(authUserLoading({ loading: true }));
       const response = await API.signup(data);
-      console.log({ response });
+
+      const user = jwt_decode(response.data?.accessToken);
+      dispatch(addAuthUser(user));
+      dispatch(addAuthToken({ token: response.data?.accessToken }));
     } catch (error) {
       console.log(error);
     } finally {
-      console.log("authLoading(false):: ", authLoading({ loading: false }));
-      dispatch(authLoading({ loading: false }));
+      dispatch(authUserLoading({ loading: false }));
     }
   };
 }
 
 export function refreshAccessToken() {
-  return async function () {
+  return async function (dispatch) {
     try {
+      dispatch(authTokenLoading({ loading: true }));
       const response = await API.refreshAccessToken();
-      console.log(response);
+      console.log(response.data);
+
+      dispatch(addAuthToken({ token: response.data?.accessToken }));
     } catch (error) {
-      console.log(error);
+      if (error?.code === "ERR_CANCELED") {
+        console.log("error.code: ", error?.code);
+        console.log("Request canceled:: ", error.message);
+      } else {
+        console.log(error);
+      }
+    } finally {
+      dispatch(authTokenLoading({ loading: false }));
     }
   };
 }

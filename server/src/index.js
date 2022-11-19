@@ -1,7 +1,10 @@
 require("dotenv").config();
+const fs = require("fs");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const https = require("https");
+const http = require("http");
 
 const { db } = require("./dbConn/mongoose/mongoose.js");
 const router = require("./routes/routes.js");
@@ -13,17 +16,13 @@ const corsOptions = require("./config/cors/cors.js");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+const HTTPPORT = parseInt(PORT) + 1;
+
+app.disable("x-powered-by");
 
 // Enable Cross Origin Resource Sharing
 app.use(cors(corsOptions));
-app.use((req, res, next) => {
-  /* console.log("-----REQ.headers-----");
-  console.log(req.headers);
-  console.log("-----RES.headers-----");
-  console.log(res.getHeaderNames()); */
-  // res.headersSent
-  next();
-});
+app.options("*", cors(corsOptions));
 
 // Parse requests with Content-Type application/json
 // so that data is available on req body
@@ -54,13 +53,14 @@ app.use(LostErrorHandler);
 // Error handling Middleware
 app.use(AppErrorHandler);
 
-// Connect to DB then start listening on PORT
-db.once("open", () => {
-  console.log("Database is connected !!");
-  app.emit("ready");
-});
 app.on("ready", () => {
   app.listen(PORT, () => {
     console.log(`App running on port ${PORT}`);
   });
+});
+
+// Connect to DB then start listening on PORT
+db.once("open", () => {
+  console.log("---Database is connected !!---");
+  app.emit("ready");
 });

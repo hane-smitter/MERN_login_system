@@ -4,9 +4,11 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function NavBar() {
-  const [authenticated, setAuthenticated] = useState(false);
+  const token = useSelector((state) => state.auth.token);
+  
   return (
     <Navbar
       collapseOnSelect
@@ -18,7 +20,7 @@ function NavBar() {
       <Navbar.Brand as={Link} to="/">
         Capital
       </Navbar.Brand>
-      {authenticated ? (
+      {Boolean(token) ? (
         <React.Fragment>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
