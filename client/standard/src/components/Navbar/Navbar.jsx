@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 
 function NavBar() {
   const token = useSelector((state) => state.auth.token);
-  
+
   return (
     <Navbar
       collapseOnSelect
@@ -25,21 +25,21 @@ function NavBar() {
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="#features">Features</Nav.Link>
+              <Nav.Link href="#new">New</Nav.Link>
               <Nav.Link href="#pricing">Pricing</Nav.Link>
               <NavDropdown title="My Account" id="collasible-nav-dropdown">
-                <NavDropdown.Item href="#action/3.1">Activity</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">profile</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">Settings</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/home/profile">
+                  Profile
+                </NavDropdown.Item>
+                <NavDropdown.Item href="#settings">Settings</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="#action/3.4">Log Out</NavDropdown.Item>
+                <Button
+                  as={NavDropdown.Item}
+                  onClick={() => console.log("logout button clicked")}
+                >
+                  Log Out
+                </Button>
               </NavDropdown>
-            </Nav>
-            <Nav>
-              <Nav.Link href="#deets">More deets</Nav.Link>
-              <Nav.Link eventKey={2} href="#memes">
-                Dank memes
-              </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </React.Fragment>

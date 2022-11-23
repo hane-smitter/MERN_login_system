@@ -1,8 +1,11 @@
 import http from "..";
-import axios from "axios";
-import { refreshAccessToken } from "../../../api";
 import { newFeedBack } from "../../../redux/reducers/feedbackSlice";
 import { browserStorage } from "../../browserStorage";
+import {
+  addAuthToken,
+  authTokenLoading,
+} from "../../../redux/reducers/authSlice";
+import { refreshAccessToken } from "../../../api";
 
 const interceptor = (store) => {
   // Request interceptor
@@ -30,7 +33,7 @@ const interceptor = (store) => {
         return response;
       },
       async (error) => {
-        console.log("RESPONSE INTERCEPTOR RUNNING!!");
+        console.log("---RESPONSE INTERCEPTOR RUNNING!!---");
         const config = error.config; // Ensuring this value is an Object even when it is undefined
         const errorResponse = error?.response;
 
@@ -38,22 +41,25 @@ const interceptor = (store) => {
           errorResponse?.status === 401 &&
           errorResponse?.headers?.get("www-authenticate")?.startsWith("Bearer ")
         ) {
-          let retry = 0;
-
           // Detach the response interceptors temporarily
           http.interceptors.response.eject(responseInterceptor);
 
           try {
-            // Increment the retry count of attempts to fetch this resource
-            retry += 1;
-
             console.group("errorResponse === 401 && WWW-Authenticate Header");
-            console.log("AUTO REFRESH A-T ATTEPT : ", retry);
+            console.log("AUTO REFRESHING A-T..");
             // console.log(config?.headers);
             console.groupEnd();
 
+            const oldAT = store?.getState().auth.token;
+            console.log(
+              "OLD A-T FROM REDUX STORE",
+              `...${oldAT.toString().substring(oldAT.length - 20)}`
+            );
+
             // Get a new Access Token
             console.log("Getting A New Access Token...");
+
+            store?.dispatch(authTokenLoading({ loading: true }));
 
             const { data } = await refreshAccessToken();
             const newAccessToken = data?.accessToken;
@@ -63,7 +69,12 @@ const interceptor = (store) => {
                 .toString()
                 .substring(newAccessToken.length - 20)}`
             );
+            // Add newly obtained Access token to initial request
             config.headers.Authorization = `Bearer ${newAccessToken}`;
+
+            // Add newly Obtained token to redux store
+            store?.dispatch(addAuthToken({ token: newAccessToken }));
+            console.log("JUST ADDED new AT to redux store!");
 
             // Attach back interceptor
             registerResponseInterceptor();
@@ -71,21 +82,21 @@ const interceptor = (store) => {
             // Fetch the Initial resource again
             return http({ ...config, headers: config.headers.toJSON() });
           } catch (reauthError) {
-            // Create recursion(loop)
-            // if (retry < 1) {
-            //   return getNewAccessToken();
-            // }
-
             console.log("reauthError -- ", reauthError);
+            // if(reauthError?.code ==="ECONNABORTED") {
+
+            // }
             // Attach back interceptor
             registerResponseInterceptor();
-            // We are rejecting with Error from initial Request
-            // return Promise.reject(error);
-            logError(error, store);
-            return Promise.reject(error);
-          }
 
-          // await getNewAccessToken();
+            // Log re-Access Token error to application
+            logError(reauthError, store);
+
+            // We are rejecting with Error from initial Request
+            return Promise.reject(error);
+          } finally {
+            store?.dispatch(authTokenLoading({ loading: false }));
+          }
         }
 
         logError(error, store);

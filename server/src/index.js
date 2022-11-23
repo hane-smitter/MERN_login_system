@@ -13,7 +13,6 @@ const corsOptions = require("./config/cors/cors.js");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-const HTTPPORT = parseInt(PORT) + 1;
 
 app.disable("x-powered-by");
 

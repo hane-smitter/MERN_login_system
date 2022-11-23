@@ -5,6 +5,7 @@ const BASEURL = "http://localhost:8000/api/";
 const config = {
   baseURL: BASEURL,
   timeout: 20000,
+  timeoutErrorMessage: "Waiting for too long...Aborted !",
 };
 
 // config.headers["cache-control"] = `no-cache`;

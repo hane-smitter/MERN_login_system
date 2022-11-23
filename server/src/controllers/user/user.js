@@ -14,7 +14,7 @@ module.exports.fetchUserProfile = async (req, res, next) => {
 
     const retrievedUser = await User.findById(userId);
 
-    res.status(201).json({
+    res.json({
       success: true,
       user: retrievedUser,
     });
