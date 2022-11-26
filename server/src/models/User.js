@@ -105,19 +105,35 @@ UserSchema.methods.generateRefreshToken = function () {
 };
 
 UserSchema.methods.generateResetToken = async function () {
-  const resetToken = crypto.randomBytes(20).toString("hex");
+/* 
+Again to reiterate hashes aren't designed to be decrypted.
+However once you have a hash you can check any string is equal
+to that hash by putting it through the same encryption with the same secret.
+*/
 
-  // Encrypt the resetToken before storing in DB
-  this.resetpasswordtoken = crypto
-    .createHmac("sha256", RESET_PASSWORD_TOKEN.secret)
-    .update(resetToken)
+// Read about base64url: [https://www.rfc-editor.org/rfc/rfc4648#section-5]
+
+  const resetTokenValue = crypto.randomBytes(40).toString("base64url");
+
+  const resetTokenSecret = crypto.randomBytes(15).toString("hex");
+
+  const resetToken = `${resetTokenValue}+${resetTokenSecret}`; // Separator of `+` since base64url doesnt include this character
+
+  // 1. Create Hash of the resetTokenValue with a secret(`resetTokenSecret`)
+  const resetTokenHash = crypto
+    .createHmac("sha256", resetTokenSecret)
+    .update(resetTokenValue)
     .digest("hex");
+
+  // 2. Create DB entry
+  this.resetpasswordtoken = resetTokenHash;
   this.resetpasswordtokenexpiry =
     Date.now() + (RESET_PASSWORD_TOKEN.expiry || 5) * 60 * 1000;
 
-  // Save
+  // 3. Save
   await this.save();
 
+  // 4. Return the reset token(unencrypted)
   return resetToken;
 };
 

@@ -1,14 +1,13 @@
 function LostErrorHandler(req, res, next) {
   res.status(404);
 
-  const providedFeedback = err?.feedback;
   res.json({
     error: "Resource not found",
-    ...(providedFeedback && { feedback: providedFeedback }),
   });
 }
 
 function AppErrorHandler(err, req, res, next) {
+  // console.log(err)
   res.status(err.status || 500);
 
   if (err.authorizationError === true) {
@@ -20,7 +19,6 @@ function AppErrorHandler(err, req, res, next) {
   const providedFeedback = err?.feedback;
   res.getHeaderNames();
   res.json({ error, ...(providedFeedback && { feedback: providedFeedback }) });
-
 }
 
 module.exports = { LostErrorHandler, AppErrorHandler };

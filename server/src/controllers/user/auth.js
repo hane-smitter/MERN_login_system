@@ -132,7 +132,9 @@ module.exports.refreshAccessToken = async (req, res, next) => {
     console.log(err);
     if (err?.name === "JsonWebTokenError") {
       return next(
-        new AutorizationError(err, "", { error_desc: "missing token" })
+        new AutorizationError(err, "You are not properly authenticated", {
+          error_desc: "missing token",
+        })
       );
     }
     next(err);
@@ -263,6 +265,7 @@ module.exports.forgotPassword = async (req, res, next) => {
     const origin = req.header("Origin");
 
     const resetUrl = `${origin}/passwordreset/${resetToken}`;
+    console.log("Password reset URL: %s", resetUrl);
 
     const message = `
             <h1>You have requested a password reset</h1>
@@ -273,6 +276,7 @@ module.exports.forgotPassword = async (req, res, next) => {
               <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
             </p>
             <p>
+            <strong>DO NOT share this link with anyone else</strong>
               <em>
                 This password reset link will <strong>expire after ${
                   process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS || 5
@@ -280,6 +284,7 @@ module.exports.forgotPassword = async (req, res, next) => {
               </em>
             </p>
         `;
+
     try {
       await sendEmail({
         to: user.email,
@@ -292,7 +297,7 @@ module.exports.forgotPassword = async (req, res, next) => {
           "An email has been sent to your email address. Check your email, and visit the link to reset your password",
         success: true,
       });
-    } catch (err) {
+    } catch (error) {
       user.resetpasswordtoken = undefined;
       user.resetpasswordtokenexpiry = undefined;
       await user.save();
@@ -305,22 +310,30 @@ module.exports.forgotPassword = async (req, res, next) => {
 
 module.exports.resetPassword = async (req, res, next) => {
   try {
+    console.log("req.params: ", req.params);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       throw new CustomError(errors.array(), 422);
     }
 
-    const resetToken = req.params.resetToken;
-    const decryptedResetToken = crypto
-      .createHmac("sha256", RESET_PASSWORD_TOKEN.secret)
-      .update(resetToken)
+    const resetToken = String(req.params.resetToken);
+
+    const [tokenValue, tokenSecret] = resetToken.split("+");
+
+    console.log({ tokenValue, tokenSecret });
+
+    // Recreate the reset Token hash
+    const resetTokenHash = crypto
+      .createHmac("sha256", tokenSecret)
+      .update(tokenValue)
       .digest("hex");
-    console.log({ decryptedResetToken });
+
     const user = await User.findOne({
-      resetpasswordtoken: decryptedResetToken,
+      resetpasswordtoken: resetTokenHash,
       resetpasswordtokenexpiry: { $gt: Date.now() },
     });
     if (!user) throw new CustomError("The reset link is invalid", 400);
+    console.log(user);
 
     user.password = req.body.password;
     user.resetpasswordtoken = undefined;

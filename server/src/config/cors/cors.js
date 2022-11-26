@@ -7,7 +7,7 @@
 // `Access-Control-Expose-Headers` header to make `WWW-Authenticate` header available via scripts
 // in browsers so we can check for a request that needs (re)authentication.
 
-const allowlist = ["http://localhost:3000"];
+const allowlist = ["http://localhost:3000", "http://localhost:8000"];
 const corsOptions = {
   origin: function (origin, callback) {
     if (allowlist.includes(origin)) {
