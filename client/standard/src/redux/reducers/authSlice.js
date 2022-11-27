@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import jwt_decode from "jwt-decode";
 import { browserStorage } from "../../utils/browserStorage";
 
-const savedToken = browserStorage.authTkn;
+const savedToken = browserStorage.authTkn ?? undefined;
 let savedUser = {};
 if (savedToken) {
   const { _id, fullName, email } = jwt_decode(savedToken);

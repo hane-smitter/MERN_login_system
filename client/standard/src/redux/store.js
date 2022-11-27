@@ -15,7 +15,9 @@ const store = configureStore({
 
 function persistState(state) {
   const userAuthToken = state.auth.token;
-  browserStorage.setAuthTkn = userAuthToken;
+  if (userAuthToken) {
+    browserStorage.setAuthTkn = userAuthToken;
+  }
 }
 
 store.subscribe(() => {

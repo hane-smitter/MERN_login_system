@@ -8,7 +8,7 @@ import {
 import { refreshAccessToken } from "../../../api";
 
 const interceptor = (store) => {
-  // Request interceptor
+  // REQUEST INTERCEPTOR
   http.interceptors.request.use(
     (config) => {
       if (config.requireAuthHeader) {
@@ -24,10 +24,10 @@ const interceptor = (store) => {
     }
   );
 
+  // RESPONSE INTERCEPTOR
   // We write the response interceptor inside a function
   // so that we may reference to it
   function registerResponseInterceptor() {
-    // Response interceptor
     const responseInterceptor = http.interceptors.response.use(
       (response) => {
         return response;
@@ -53,7 +53,7 @@ const interceptor = (store) => {
             const oldAT = store?.getState().auth.token;
             console.log(
               "OLD A-T FROM REDUX STORE",
-              `...${oldAT.toString().substring(oldAT.length - 20)}`
+              `...${oldAT?.toString()?.substring(oldAT.length - 20)}`
             );
 
             // Get a new Access Token
@@ -122,11 +122,18 @@ function logError(error, store) {
     console.log(error.response.headers);
     console.groupEnd();
 
+    let msg;
+    if (error.response.status === 401) {
+      msg = "You need to log in";
+    } else {
+      msg = error.response.data?.feedback;
+    }
+
     // Trigger Feedback alert in the application
     store?.dispatch(
       newFeedBack({
         type: error.response.status,
-        msg: error.response.data?.feedback,
+        msg,
       })
     );
   } else if (error.request) {

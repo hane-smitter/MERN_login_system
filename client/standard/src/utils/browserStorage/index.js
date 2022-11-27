@@ -2,7 +2,14 @@ const storage = sessionStorage;
 
 const browserStorage = {
   get authTkn() {
-    const token = JSON.parse(storage.getItem("u:Id") ?? null);
+    let token = storage.getItem("u:Id");
+    console.log("Token found:  ", typeof token)
+
+    if (token) {
+      console.log("Kwani ckuizi undefined ni true tena!!")
+      token = JSON.parse(token);
+    }
+
     return token;
   },
 
