@@ -268,7 +268,7 @@ module.exports.forgotPassword = async (req, res, next) => {
     console.log("Password reset URL: %s", resetUrl);
 
     const message = `
-            <h1>You have requested a password reset</h1>
+            <h1>You have requested to change your password</h1>
             <p>You are receiving this because you have requested to reset password for your account.<br/>
               Please click on the following link, or paste in your browser to complete the password reset.
             </p>
@@ -276,12 +276,19 @@ module.exports.forgotPassword = async (req, res, next) => {
               <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
             </p>
             <p>
-            <strong>DO NOT share this link with anyone else</strong>
               <em>
-                This password reset link will <strong>expire after ${
-                  process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS || 5
-                } minutes.</strong>
+                If you did not request this, you can safely ignore this email and your password will remain unchanged.
               </em>
+            </p>
+            <p>
+            <strong>DO NOT share this link with anyone else!</strong><br />
+              <small>
+                <em>
+                  This password reset link will <strong>expire after ${
+                    process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS || 5
+                  } minutes.</strong>
+                </em>
+              <small/>
             </p>
         `;
 
@@ -340,6 +347,16 @@ module.exports.resetPassword = async (req, res, next) => {
     user.resetpasswordtokenexpiry = undefined;
 
     await user.save();
+
+    // Email to notify owner of the account
+    const message = `<h3>This is a confirmation that you have changed Password for your account.</h3>`;
+    // No need to await
+    sendEmail({
+      to: user.email,
+      html: message,
+      subject: "Password changed",
+    });
+
     res.json({
       message: "Password reset successful",
       success: true,
