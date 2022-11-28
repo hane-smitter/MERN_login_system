@@ -1,9 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import Dashboard from "../components/Dashboard";
 import Home from "../components/Home/Home";
-import PrivateRoute from "../components/PrivateRoute";
+import PrivateRoute from "../components/Guards/PrivateGuard";
+import PublicRoute from "../components/Guards/PublicGuard";
 import Profile from "../components/Profile/Profile";
-import PublicRoute from "../components/PublicRoute";
 import AppLayout from "../pages/AppLayout";
 import Login from "../pages/LoginForm";
 import Lost from "../pages/Lost";

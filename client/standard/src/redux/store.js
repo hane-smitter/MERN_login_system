@@ -17,6 +17,8 @@ function persistState(state) {
   const userAuthToken = state.auth.token;
   if (userAuthToken) {
     browserStorage.setAuthTkn = userAuthToken;
+  } else {
+    browserStorage.deleteAuthTkn();
   }
 }
 

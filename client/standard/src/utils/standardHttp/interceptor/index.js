@@ -4,6 +4,7 @@ import { browserStorage } from "../../browserStorage";
 import {
   addAuthToken,
   authTokenLoading,
+  authUserLogout,
 } from "../../../redux/reducers/authSlice";
 import { refreshAccessToken } from "../../../api";
 
@@ -83,14 +84,11 @@ const interceptor = (store) => {
             return http({ ...config, headers: config.headers.toJSON() });
           } catch (reauthError) {
             console.log("reauthError -- ", reauthError);
-            // if(reauthError?.code ==="ECONNABORTED") {
-
-            // }
             // Attach back interceptor
             registerResponseInterceptor();
 
-            // Log re-Access Token error to application
-            logError(reauthError, store);
+            // Log with error of request before trying to get new AccessToken
+            logError(error, store);
 
             // We are rejecting with Error from initial Request
             return Promise.reject(error);
@@ -125,6 +123,9 @@ function logError(error, store) {
     let msg;
     if (error.response.status === 401) {
       msg = "You need to log in";
+
+      // Fire redux store logout action
+      store?.dispatch(authUserLogout());
     } else {
       msg = error.response.data?.feedback;
     }

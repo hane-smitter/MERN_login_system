@@ -2,18 +2,13 @@ import React from "react";
 import Stack from "react-bootstrap/Stack";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
 
 import image from "../../images/capital.jpg";
-import { logout } from "../../redux/dispatchers";
 
 function Home() {
-  const dispatch = useDispatch();
-
   return (
     <Stack direction="horizontal" gap={2}>
       <div>
-        <button onClick={() => dispatch(logout())}>trigger logout</button>
         <img
           src={image}
           alt="banner"

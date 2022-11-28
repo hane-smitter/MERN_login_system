@@ -44,6 +44,14 @@ const authSlice = createSlice({
         user_loading: Boolean(payload?.loading),
       };
     },
+    authUserLogout() {
+      return {
+        user: {},
+        token: undefined,
+        user_loading: false,
+        token_loading: false,
+      };
+    },
     authTokenLoading(state, action) {
       const { payload } = action;
       return {
@@ -54,7 +62,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { addAuthToken, addAuthUser, authUserLoading, authTokenLoading } =
-  authSlice.actions;
+export const {
+  addAuthToken,
+  addAuthUser,
+  authUserLoading,
+  authTokenLoading,
+  authUserLogout,
+} = authSlice.actions;
 
 export default authSlice.reducer;

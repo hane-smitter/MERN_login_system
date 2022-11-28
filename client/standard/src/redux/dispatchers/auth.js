@@ -5,6 +5,7 @@ import {
   addAuthToken,
   authTokenLoading,
   authUserLoading,
+  authUserLogout,
 } from "../reducers/authSlice";
 
 export function login(data) {
@@ -70,6 +71,7 @@ export function logout() {
       const response = await API.logout();
 
       console.log("---LOGOUT SUCCESS---: ", response.data);
+      dispatch(authUserLogout());
     } catch (error) {
       console.log(error);
     }

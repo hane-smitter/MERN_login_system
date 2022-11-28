@@ -4,10 +4,12 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../redux/dispatchers";
 
 function NavBar() {
   const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch();
 
   return (
     <Navbar
@@ -25,8 +27,6 @@ function NavBar() {
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="#new">New</Nav.Link>
-              <Nav.Link href="#pricing">Pricing</Nav.Link>
               <NavDropdown title="My Account" id="collasible-nav-dropdown">
                 <NavDropdown.Item as={Link} to="/home/profile">
                   Profile
@@ -35,11 +35,13 @@ function NavBar() {
                 <NavDropdown.Divider />
                 <Button
                   as={NavDropdown.Item}
-                  onClick={() => console.log("logout button clicked")}
+                  onClick={() => dispatch(logout())}
                 >
                   Log Out
                 </Button>
               </NavDropdown>
+              <Nav.Link href="#new">What's New ?</Nav.Link>
+              <Nav.Link href="#history">History</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </React.Fragment>

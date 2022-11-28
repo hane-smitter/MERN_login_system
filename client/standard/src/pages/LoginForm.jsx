@@ -1,7 +1,6 @@
-import { useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,21 +9,7 @@ import { login } from "../redux/dispatchers";
 
 function Login() {
   const dispatch = useDispatch();
-  const { user_loading: loginLoading, user } = useSelector(({ auth }) => auth);
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const redirectedFrom = location?.state?.comingFrom;
-  const GOTO = redirectedFrom
-    ? `${redirectedFrom?.pathname}${redirectedFrom?.search}`
-    : "/home";
-
-  // useEffect(() => {
-  //   if (Object.keys(user).length > 0) {
-  //     console.log("Navigating to: ", GOTO);
-  //     navigate({ to: GOTO });
-  //   }
-  // }, [user]);
+  const { user_loading: loginLoading } = useSelector(({ auth }) => auth);
 
   const formik = useFormik({
     initialValues: {

@@ -75,7 +75,8 @@ export const refreshAccessToken = () => {
  * Logout API endpoint
  * @returns {Promise} - No response body
  */
-export const logout = () => http.get("/logout", { requireAuthHeader: true });
+export const logout = () =>
+  http.get("/logout", { requireAuthHeader: true, withCredentials: true });
 
 /**
  * Request password reset link API endpoint
