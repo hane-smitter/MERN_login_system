@@ -1,15 +1,25 @@
 import React, { useState, useEffect } from "react";
 import Alert from "react-bootstrap/Alert";
 import { connect } from "react-redux";
+import { useLocation } from "react-router-dom";
+
 import { closeFeedback } from "../../redux/reducers/feedbackSlice";
 
 function AppFeedback({ openAlert, feedbackMsg, type, closeAlert, title }) {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     console.log("OPEN FEEDBACK STATE: ", openAlert);
     setOpen(openAlert);
   }, [openAlert]);
+
+  // When route changes, close the notification
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [location]);
 
   return (
     <div className="position-relative w-100">
