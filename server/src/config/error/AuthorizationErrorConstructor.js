@@ -21,7 +21,7 @@ class AuthorizationError extends CustomError {
 
     let { realm, ...others } = this.authParams;
 
-    realm = realm ? realm : "app.com";
+    realm = realm ? realm : "apps";
 
     str = `realm=${realm}`;
 
@@ -38,7 +38,7 @@ class AuthorizationError extends CustomError {
       if (array.length - 1 === index) {
         comma = "";
       }
-      str = str + `${authParam}=${this.authParams[authParam]}${comma}`;
+      str = str + ` ${authParam}=${this.authParams[authParam]}${comma}`;
     });
 
     console.log("--Authenticate header string returned: -- ", str);
