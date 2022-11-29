@@ -264,7 +264,7 @@ module.exports.forgotPassword = async (req, res, next) => {
     const resetToken = await user.generateResetToken();
     const origin = req.header("Origin");
 
-    const resetUrl = `${origin}/passwordreset/${resetToken}`;
+    const resetUrl = `${origin}/resetpass/${resetToken}`;
     console.log("Password reset URL: %s", resetUrl);
 
     const message = `
