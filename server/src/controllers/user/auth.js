@@ -269,7 +269,7 @@ module.exports.forgotPassword = async (req, res, next) => {
 
     const message = `
             <h1>You have requested to change your password</h1>
-            <p>You are receiving this because you have requested to reset password for your account.<br/>
+            <p>You are receiving this because someone(hopefully you) has requested to reset password for your account.<br/>
               Please click on the following link, or paste in your browser to complete the password reset.
             </p>
             <p>
