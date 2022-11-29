@@ -7,6 +7,7 @@ import {
   authUserLoading,
   authUserLogout,
 } from "../reducers/authSlice";
+import { newFeedBack } from "../reducers/feedbackSlice";
 
 export function login(data) {
   return async function (dispatch) {
@@ -74,6 +75,48 @@ export function logout() {
       dispatch(authUserLogout());
     } catch (error) {
       console.log(error);
+    }
+  };
+}
+
+export function forgotPassword(data) {
+  return async function (dispatch) {
+    try {
+      dispatch(authUserLoading({ loading: true }));
+      const response = await API.forgotpass(data);
+      dispatch(
+        newFeedBack({
+          msg: "Your Password reset was successfully initiated. Please check your inbox for further instructions",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        newFeedBack({
+          msg: "Oops! We couldn't initiate a password reset at this time. Please try again later",
+        })
+      );
+      console.log("Aha! We hit a block: ", error);
+    } finally {
+      dispatch(authUserLoading({ loading: false }));
+    }
+  };
+}
+
+export function resetPassword(data) {
+  return async function (dispatch) {
+    try {
+      dispatch(authUserLoading({ loading: true }));
+      const response = await API.resetpass(data);
+      dispatch(
+        newFeedBack({
+          msg: "Your Password has been changed successfuly. Proceed to login with your new password",
+          type: "success",
+        })
+      );
+    } catch (error) {
+      console.log("Aha! We hit a block: ", error);
+    } finally {
+      dispatch(authUserLoading({ loading: false }));
     }
   };
 }

@@ -36,13 +36,12 @@ function Signup() {
     onSubmit: (values, actions) => {
       // alert(JSON.stringify(values, null, 2));
       dispatch(signup(values));
-      actions.setSubmitting(signupLoading);
     },
   });
 
   return (
     <div style={{ maxWidth: 500, marginInline: "auto" }}>
-      <h2 className="mb-3">Create account</h2>
+      <h2 className="text-uppercase mb-3">Create account</h2>
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>First Name</Form.Label>
@@ -141,8 +140,8 @@ function Signup() {
           ) : null}
         </Form.Group>
 
-        <Button variant="primary" type="submit" disabled={formik.isSubmitting}>
-          {formik.isSubmitting ? "Loading..." : "Submit"}
+        <Button variant="primary" type="submit" disabled={signupLoading}>
+          {signupLoading ? "Loading..." : "Submit"}
         </Button>
       </Form>
     </div>

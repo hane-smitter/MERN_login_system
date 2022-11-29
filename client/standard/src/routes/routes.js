@@ -8,6 +8,7 @@ import AppLayout from "../pages/AppLayout";
 import Login from "../pages/LoginForm";
 import Lost from "../pages/Lost";
 import Signup from "../pages/SignupForm";
+import ForgotPass from "../pages/ForgotPassForm";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
           { path: "", element: <Home /> },
           { path: "/login", element: <Login /> },
           { path: "/signup", element: <Signup /> },
+          { path: "/recoverpass", element: <ForgotPass /> },
         ],
       },
       {
