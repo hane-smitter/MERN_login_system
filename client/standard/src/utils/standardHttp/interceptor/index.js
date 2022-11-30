@@ -1,11 +1,11 @@
 import http from "..";
-import { newFeedBack } from "../../../redux/reducers/feedbackSlice";
+import { newFeedBack } from "../../../redux/slices/feedbackSlice";
 import { browserStorage } from "../../browserStorage";
 import {
   addAuthToken,
   authTokenLoading,
   authUserLogout,
-} from "../../../redux/reducers/authSlice";
+} from "../../../redux/slices/authSlice";
 import { refreshAccessToken } from "../../../api";
 
 const interceptor = (store) => {

@@ -3,7 +3,7 @@ import Alert from "react-bootstrap/Alert";
 import { connect } from "react-redux";
 import { useLocation } from "react-router-dom";
 
-import { closeFeedback } from "../../redux/reducers/feedbackSlice";
+import { closeFeedback } from "../../redux/slices/feedbackSlice";
 
 function AppFeedback({ openAlert, feedbackMsg, type, closeAlert, title }) {
   const [open, setOpen] = useState(false);

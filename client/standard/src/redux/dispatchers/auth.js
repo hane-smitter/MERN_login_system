@@ -6,8 +6,8 @@ import {
   authTokenLoading,
   authUserLoading,
   authUserLogout,
-} from "../reducers/authSlice";
-import { newFeedBack } from "../reducers/feedbackSlice";
+} from "../slices/authSlice";
+import { newFeedBack } from "../slices/feedbackSlice";
 
 export function login(data) {
   return async function (dispatch) {

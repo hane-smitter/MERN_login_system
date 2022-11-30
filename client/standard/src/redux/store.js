@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import todosReducer from "./reducers/todosSlice";
-import feedbackSlice from "./reducers/feedbackSlice";
-import authSlice from "./reducers/authSlice";
+import todosReducer from "./slices/todosSlice";
+import feedbackSlice from "./slices/feedbackSlice";
+import authSlice from "./slices/authSlice";
 import { browserStorage } from "../utils/browserStorage";
 
 const store = configureStore({

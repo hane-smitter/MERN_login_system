@@ -1,5 +1,5 @@
 import * as API from "../../api";
-import { addAuthUser, authUserLoading } from "../reducers/authSlice";
+import { addAuthUser, authUserLoading } from "../slices/authSlice";
 
 export function getUserProfile(id) {
   return async function (dispatch) {
