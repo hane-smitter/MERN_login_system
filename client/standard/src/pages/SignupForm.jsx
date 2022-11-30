@@ -8,7 +8,7 @@ import { signup } from "../redux/dispatchers";
 
 function Signup() {
   const dispatch = useDispatch();
-  const signupLoading = useSelector((state) => state.auth.loading);
+  const signupLoading = useSelector((state) => state.auth.user_loading);
 
   const formik = useFormik({
     initialValues: {

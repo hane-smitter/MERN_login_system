@@ -1,14 +1,16 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
 import { resetPassword } from "../redux/dispatchers";
 
-function ResetPassword() {
+function ResetPass() {
+  const { resetToken } = useParams();
   const dispatch = useDispatch();
-  const resetLoading = useSelector((state) => state.auth.loading);
+  const resetLoading = useSelector((state) => state.auth.user_loading);
 
   const formik = useFormik({
     initialValues: {
@@ -24,14 +26,15 @@ function ResetPassword() {
         .oneOf([Yup.ref("password"), null], "Passwords must match"),
     }),
     onSubmit: (values, actions) => {
-      // alert(JSON.stringify(values, null, 2));
+      // Attach resetToken to values
+      values.resetToken = resetToken;
       dispatch(resetPassword(values));
     },
   });
 
   return (
     <div style={{ maxWidth: 500, marginInline: "auto" }}>
-      <h2 className="text-uppercase mb-3">Create account</h2>
+      <h2 className="text-uppercase mb-3">Change your password</h2>
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Password</Form.Label>
@@ -79,4 +82,4 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default ResetPass;

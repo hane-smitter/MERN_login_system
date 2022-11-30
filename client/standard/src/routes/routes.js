@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Dashboard from "../components/Dashboard";
 import Home from "../components/Home/Home";
 import PrivateRoute from "../components/Guards/PrivateGuard";
@@ -9,6 +9,7 @@ import Login from "../pages/LoginForm";
 import Lost from "../pages/Lost";
 import Signup from "../pages/SignupForm";
 import ForgotPass from "../pages/ForgotPassForm";
+import ResetPass from "../pages/ResetPassForm";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
           { path: "/login", element: <Login /> },
           { path: "/signup", element: <Signup /> },
           { path: "/recoverpass", element: <ForgotPass /> },
+          { path: "resetpass/:resetToken", element: <ResetPass /> },
         ],
       },
       {
@@ -33,10 +35,11 @@ const router = createBrowserRouter([
           { path: "profile", element: <Profile /> },
         ],
       },
+      { path: "404", element: <Lost /> },
       {
         path: "*",
-        element: <Lost />
-      }
+        element: <Navigate to="/404" />,
+      },
     ],
   },
 ]);
