@@ -7,6 +7,7 @@ const {
   logout,
   resetPassword,
   forgotPassword,
+  logoutAllDevices,
 } = require("../controllers/user/auth");
 const { fetchUserProfile } = require("../controllers/user/user");
 const { authCheck } = require("../middlewares/authCheck");
@@ -36,18 +37,25 @@ router.post("/login", validators.loginValidator, login);
 router.post("/signup", validators.signupValidator, signup);
 
 /**
- * @method - GET
+ * @method - POST
  * @param - /api/logout
  * @description - Logout
  */
-router.get("/logout", authCheck, logout);
+router.post("/logout", authCheck, logout);
 
 /**
- * @method - GET
+ * @method - POST
+ * @param - /api/master-logout
+ * @description - Logout from all devices
+ */
+ router.post("/master-logout", authCheck, logoutAllDevices);
+
+/**
+ * @method - POST
  * @param - /api/reauth
  * @description - Regenerate Access Token
  */
-router.get("/reauth", refreshAccessToken);
+router.post("/reauth", refreshAccessToken);
 
 /**
  * @method - POST

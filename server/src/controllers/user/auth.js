@@ -249,6 +249,34 @@ module.exports.logout = async (req, res, next) => {
   }
 };
 
+/* LOGOUT USER FROM ALL DEVICES */
+module.exports.logoutAllDevices = async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    // Strip access priviledges of an AccessToken
+    // by deleting its entry from the DB
+    // delete all tokens
+    user.tokens = undefined;
+    await user.save();
+
+    // Expire the refresh token
+    // `max-age` takes precedence over `expires` if both are stated in cookie options.
+    // But express converts the option `maxAge` to `expires`.
+    const expireCookieOptions = Object.assign({}, REFRESH_TOKEN.cookieOptions, {
+      maxAge: 0,
+    });
+    // Clear the refresh token cookie
+    res.cookie(REFRESH_TOKEN.cookieName, "", expireCookieOptions);
+    res.status(205).json({
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 module.exports.forgotPassword = async (req, res, next) => {
   try {
     const errors = validationResult(req);
