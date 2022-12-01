@@ -64,7 +64,8 @@ export const refreshAccessToken = () => {
   refreshAccessTokenController = new AbortController();
   const signal = refreshAccessTokenController.signal;
 
-  return http.get("/reauth", {
+  return http("/reauth", {
+    method: "post",
     withCredentials: true,
     requireAuthHeader: true,
     signal,
@@ -76,7 +77,17 @@ export const refreshAccessToken = () => {
  * @returns {Promise} - No response body
  */
 export const logout = () =>
-  http.get("/logout", { requireAuthHeader: true, withCredentials: true });
+  http.post("/logout", { requireAuthHeader: true, withCredentials: true });
+
+/**
+ * Logout from All Devices API endpoint
+ * @returns {Promise} - No response body
+ */
+export const logoutEverywhere = () =>
+  http.post("/master-logout", {
+    requireAuthHeader: true,
+    withCredentials: true,
+  });
 
 /**
  * Request password reset link API endpoint

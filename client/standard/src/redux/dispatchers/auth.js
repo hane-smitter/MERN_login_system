@@ -79,6 +79,19 @@ export function logout() {
   };
 }
 
+export function logoutEverywhere() {
+  return async function (dispatch) {
+    try {
+      const response = await API.logoutEverywhere();
+
+      console.log("---LOGOUT FROM ALL DEVICES SUCCESS---: ", response.data);
+      dispatch(authUserLogout());
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+
 export function forgotPassword(data) {
   return async function (dispatch) {
     try {

@@ -5,7 +5,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../redux/dispatchers";
+import { logout, logoutEverywhere } from "../../redux/dispatchers";
 
 function NavBar() {
   const token = useSelector((state) => state.auth.token);
@@ -38,6 +38,12 @@ function NavBar() {
                   onClick={() => dispatch(logout())}
                 >
                   Log Out
+                </Button>
+                <Button
+                  as={NavDropdown.Item}
+                  onClick={() => dispatch(logoutEverywhere())}
+                >
+                  Log Out From All Devices
                 </Button>
               </NavDropdown>
               <Nav.Link href="#new">What's New ?</Nav.Link>

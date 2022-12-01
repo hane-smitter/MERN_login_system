@@ -16,6 +16,10 @@ const interceptor = (store) => {
         const token = browserStorage.authTkn;
         config.headers.Authorization = `Bearer ${token}`;
         delete config.requireAuthHeader;
+        console.log(
+          "Header attached on request: ",
+          config.headers.Authorization
+        );
       }
       return config;
     },
@@ -122,7 +126,7 @@ function logError(error, store) {
 
     let msg;
     if (error.response.status === 401) {
-      msg = "You need to log in";
+      msg = "You need to Log In";
 
       // Fire redux store logout action
       store?.dispatch(authUserLogout());
