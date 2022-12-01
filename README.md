@@ -98,8 +98,6 @@ RESET_PASSWORD_TOKEN_EXPIRY_MINS=
 | AUTH_EMAIL_PASSWORD              | SMTP email password to be used with NodeMailer                 |
 | EMAIL_FROM                       | The sender that will be set when sending email                 |
 
-Start testing API endpoints quickly by importing `postman_collection_API.json` into your [Postman](https://www.postman.com/company/about-postman/) app.
-
 ## Run the project
 
 You can run the project using configured scripts.
@@ -107,6 +105,8 @@ You can run the project using configured scripts.
 To run the backend, `cd` into the `server` folder then start then type the command in your terminal:
 
 `npm run dev`
+
+Start testing API endpoints quickly by importing `postman_collection_API.json` into your [Postman](https://www.postman.com/company/about-postman/) app.
 
 To run the frontend, `cd` into `client/standard` folder and run the comand in you terminal:
 
