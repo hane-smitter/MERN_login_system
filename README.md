@@ -20,6 +20,7 @@ This project is built using MERN stack.
 - React-bootstrap, for ready made components to use.
 - Bootstrap V5, for styling the application.
 - Axios, for making API calls.
+- Formik for form validations.
 
 #### Server
 
@@ -99,10 +100,23 @@ RESET_PASSWORD_TOKEN_EXPIRY_MINS=
 
 Start testing API endpoints quickly by importing `postman_collection_API.json` into your [Postman](https://www.postman.com/company/about-postman/) app.
 
-<!-- A **methodical guide** on how to create the modern day authentication Logic for <strong>Single Page Applications(SPA<small>s</small>)</strong> that communicate with <strong>API<small>s</small></strong>. -->
+## Run the project
 
-<!--
-Possible titles
+You can run the project using configured scripts.
 
-- Build a MERN authentication system with security implementation in mind
- -->
+To run the backend, `cd` into the `server` folder then start then type the command in your terminal:
+
+`npm run dev`
+
+To run the frontend, `cd` into `client/standard` folder and run the comand in you terminal:
+
+`npm start`
+
+## Author
+
+- Twitter: [@smitterhane](https://twitter.com/intent/user?screen_name=smitterhane)
+- Email: [@smitterhane](mailto:hanesmitter3@gmail.com)
+
+## License
+
+- This project is MIT licensed.
