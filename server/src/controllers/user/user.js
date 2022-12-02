@@ -23,3 +23,16 @@ module.exports.fetchUserProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+/* FETCH PROFILE OF AUTHENTICATED USER */
+module.exports.fetchAuthUserProfile = async (req, res, next) => {
+  try {
+    res.json({
+      success: true,
+      user: req.user,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};

@@ -9,7 +9,10 @@ const {
   forgotPassword,
   logoutAllDevices,
 } = require("../controllers/user/auth");
-const { fetchUserProfile } = require("../controllers/user/user");
+const {
+  fetchUserProfile,
+  fetchAuthUserProfile,
+} = require("../controllers/user/user");
 const { authCheck } = require("../middlewares/authCheck");
 const validators = require("../validator");
 
@@ -48,7 +51,7 @@ router.post("/logout", authCheck, logout);
  * @param - /api/master-logout
  * @description - Logout from all devices
  */
- router.post("/master-logout", authCheck, logoutAllDevices);
+router.post("/master-logout", authCheck, logoutAllDevices);
 
 /**
  * @method - POST
@@ -77,11 +80,18 @@ router.patch(
 
 /**
  * @method - GET
- * @param - /u/:id
- * @description - Fetch user profile
+ * @param - /user/me
+ * @description - Fetch profile of authenticated user
+ */
+router.get("/user/me", authCheck, fetchAuthUserProfile);
+
+/**
+ * @method - GET
+ * @param - /user/:id
+ * @description - Fetch user profile by ID
  */
 router.get(
-  "/u/:id",
+  "/user/:id",
   authCheck,
   validators.fetchUserProfileValidator,
   fetchUserProfile
