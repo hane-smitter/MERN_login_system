@@ -13,7 +13,8 @@ const PublicRoute = () => {
 
   console.log("location in route guard;; ", location);
 
-  if (Object.keys(user).length > 0) {
+  if (Object.keys(Object(user)).length > 0) {
+    console.log("User length > 0: ", user);
     return <Navigate to={GOTO} state={{ comingFrom: location }} />;
   }
   return <Outlet />;

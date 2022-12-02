@@ -7,9 +7,9 @@ const Profile = () => {
   const dispatch = useDispatch();
   const { user_loading, user } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    dispatch(getUserProfile(user?._id));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getUserProfile(user?._id));
+  // }, []);
 
   return (
     <div className="container">

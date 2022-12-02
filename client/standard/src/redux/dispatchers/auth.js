@@ -8,6 +8,7 @@ import {
   authUserLogout,
 } from "../slices/authSlice";
 import { newFeedBack } from "../slices/feedbackSlice";
+import { getUserProfile } from "./user";
 
 export function login(data) {
   return async function (dispatch) {
@@ -15,9 +16,18 @@ export function login(data) {
       dispatch(authUserLoading({ loading: true }));
       const response = await API.login(data);
 
-      const user = jwt_decode(response.data?.accessToken);
-      dispatch(addAuthUser(user));
-      dispatch(addAuthToken({ token: response.data?.accessToken }));
+      const { accessToken } = response.data;
+
+      // dispatch(addAuthUser({ user: response.data?.user }));
+      // const user = jwt_decode(response.data?.accessToken);
+      // dispatch(addAuthUser({ user }));
+      // dispatch(addAuthToken({ token: response.data?.accessToken }));
+
+      // Add the retrieved Access Token before loading user profile
+      dispatch(addAuthToken({ token: accessToken }));
+
+      // Load the user profile (will use the access token in redux store)
+      dispatch(getUserProfile());
 
       console.log("---LOGIN SUCCESS---: ", response.data);
     } catch (error) {
@@ -34,9 +44,16 @@ export function signup(data) {
       dispatch(authUserLoading({ loading: true }));
       const response = await API.signup(data);
 
-      const user = jwt_decode(response.data?.accessToken);
-      dispatch(addAuthUser(user));
-      dispatch(addAuthToken({ token: response.data?.accessToken }));
+      const { accessToken } = response.data;
+
+      // const user = jwt_decode(accessToken);
+      // dispatch(addAuthUser({ user }));
+
+      // Add the retrieved Access Token before loading user profile
+      dispatch(addAuthToken({ token: accessToken }));
+
+      // Load the user profile(will use the access token)
+      dispatch(getUserProfile());
     } catch (error) {
       console.log(error);
     } finally {
@@ -51,8 +68,13 @@ export function refreshAccessToken() {
       dispatch(authTokenLoading({ loading: true }));
       const response = await API.refreshAccessToken();
       console.log(response.data);
+      const { accessToken } = response.data;
 
-      dispatch(addAuthToken({ token: response.data?.accessToken }));
+      // Add the new Access token to redux store
+      dispatch(addAuthToken({ token: accessToken }));
+
+      // Load the user Profile
+      dispatch(getUserProfile(accessToken));
     } catch (error) {
       if (error?.code === "ERR_CANCELED") {
         console.log("error.code: ", error?.code);
