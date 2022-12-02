@@ -13,6 +13,13 @@ const store = configureStore({
   },
 });
 
+window.addEventListener("beforeunload", () => {
+  const userAuthToken = store.getState().auth.token;
+  if (userAuthToken) {
+    browserStorage.setAuthTkn = userAuthToken;
+  }
+});
+
 function persistState(state) {
   const userAuthToken = state.auth.token;
   if (userAuthToken) {
@@ -22,7 +29,7 @@ function persistState(state) {
   }
 }
 
-store.subscribe(() => {
-  persistState(store.getState());
-});
+// store.subscribe(() => {
+//   persistState(store.getState());
+// });
 export default store;

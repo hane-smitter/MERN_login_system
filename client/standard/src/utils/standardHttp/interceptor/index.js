@@ -13,7 +13,7 @@ const interceptor = (store) => {
   http.interceptors.request.use(
     (config) => {
       if (config.requireAuthHeader) {
-        const token = browserStorage.authTkn;
+        const token = store?.getState()?.auth?.token || browserStorage.authTkn;
         config.headers.Authorization = `Bearer ${token}`;
         delete config.requireAuthHeader;
         console.log(
@@ -55,7 +55,7 @@ const interceptor = (store) => {
             // console.log(config?.headers);
             console.groupEnd();
 
-            const oldAT = store?.getState().auth.token;
+            const oldAT = store?.getState().auth?.token;
             console.log(
               "OLD A-T FROM REDUX STORE",
               `...${oldAT?.toString()?.substring(oldAT.length - 20)}`
@@ -64,7 +64,7 @@ const interceptor = (store) => {
             // Get a new Access Token
             console.log("Getting A New Access Token...");
 
-            store?.dispatch(authTokenLoading({ loading: true }));
+            // store?.dispatch(authTokenLoading({ loading: true }));
 
             const { data } = await refreshAccessToken();
             const newAccessToken = data?.accessToken;
@@ -96,9 +96,10 @@ const interceptor = (store) => {
 
             // We are rejecting with Error from initial Request
             return Promise.reject(error);
-          } finally {
-            store?.dispatch(authTokenLoading({ loading: false }));
           }
+          // finally {
+          //   store?.dispatch(authTokenLoading({ loading: false }));
+          // }
         }
 
         logError(error, store);

@@ -2,12 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 import jwt_decode from "jwt-decode";
 import { browserStorage } from "../../utils/browserStorage";
 
-const savedToken = browserStorage.authTkn ?? undefined;
+// const savedToken = browserStorage.authTkn ?? undefined;
+const savedToken = undefined;
 let savedUser = {};
-if (savedToken) {
-  const { _id, fullName, email } = jwt_decode(savedToken);
-  savedUser = { _id, fullName, email };
-}
+// if (savedToken) {
+//   const { _id, fullName, email } = jwt_decode(savedToken);
+//   savedUser = { _id, fullName, email };
+// }
 
 // We shall create TWO loading indicators:
 //  - One when `user` info is being processed [e.g Login, Sign up]
@@ -32,7 +33,7 @@ const authSlice = createSlice({
       const { payload } = action;
       return {
         ...state,
-        user: { ...state.user, ...payload },
+        user: { ...state.user, ...payload.user },
       };
     },
     authUserLoading(state, action) {
