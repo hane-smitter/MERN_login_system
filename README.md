@@ -1,5 +1,7 @@
 # MERN Login System
-
+<!--
+https://dev-to-uploads.s3.amazonaws.com/uploads/articles/be6k63aiuu0m1rq1tjsb.jpg
+-->
 This project runs down a **a methodical framework** of how to implement an **advanced** authentication system in a _3-tier application architecture_.
 
 This can serve as a boilerplate to bootstrap authentication logic for your next application.

@@ -6,6 +6,8 @@ const validators = require("../validator");
 
 const router = express.Router();
 
+router.use("/users", (req, res, next) => next());
+
 router.get("/test", function (req, res) {
   res.send("Hello its working!!");
 });
@@ -76,11 +78,7 @@ router.patch(
  * @param - /api/users/me
  * @description - Get authenticated user
  */
-router.get(
-  "/users/me",
-  requireAuthentication,
-  usersController.fetchAuthUserProfile
-);
+router.get("/me", requireAuthentication, usersController.fetchAuthUserProfile);
 
 /**
  * @method - GET
@@ -88,7 +86,7 @@ router.get(
  * @description - Get user by ID
  */
 router.get(
-  "/users/:id",
+  "/:id",
   requireAuthentication,
   validators.fetchUserProfileValidator,
   usersController.fetchUserProfile

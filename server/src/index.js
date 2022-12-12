@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const { db } = require("./dbConn/mongoose/mongoose.js");
-const router = require("./routes/routes.js");
+const routes = require("./routes");
 const {
   AppErrorHandler,
   LostErrorHandler,
@@ -33,7 +33,7 @@ app.get("/", function (req, res) {
 });
 
 // Routes for our application
-app.use("/api", router);
+app.use("/api", routes);
 
 // Fail gracefully request for routes not on the server
 // on all http methods
