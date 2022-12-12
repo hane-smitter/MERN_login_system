@@ -13,7 +13,7 @@ const ACCESS_TOKEN = {
     - If token is invalid or expired, throw an `AuthorizationError`.
 - Check if the provided token is in the database record of its associated user.
 */
-module.exports.authCheck = async (req, res, next) => {
+module.exports.requireAuthentication = async (req, res, next) => {
   try {
     const authHeader = req.header("Authorization");
     if (!authHeader?.startsWith("Bearer "))

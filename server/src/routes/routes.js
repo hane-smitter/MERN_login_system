@@ -1,19 +1,7 @@
 const express = require("express");
 
-const {
-  login,
-  signup,
-  refreshAccessToken,
-  logout,
-  resetPassword,
-  forgotPassword,
-  logoutAllDevices,
-} = require("../controllers/user/auth");
-const {
-  fetchUserProfile,
-  fetchAuthUserProfile,
-} = require("../controllers/user/user");
-const { authCheck } = require("../middlewares/authCheck");
+const usersController = require("../controllers/user");
+const { requireAuthentication } = require("../middlewares/authCheck");
 const validators = require("../validator");
 
 const router = express.Router();
@@ -21,51 +9,56 @@ const router = express.Router();
 router.get("/test", function (req, res) {
   res.send("Hello its working!!");
 });
-router.all("/longwait", function (req, res) {
-  // res.send("Unening wait!!");
-});
 
 /**
  * @method - POST
  * @param - /api/login
  * @description - User Login
  */
-router.post("/login", validators.loginValidator, login);
+router.post("/login", validators.loginValidator, usersController.login);
 
 /**
  * @method - POST
  * @param - /api/signup
  * @description - User Signup
  */
-router.post("/signup", validators.signupValidator, signup);
+router.post("/signup", validators.signupValidator, usersController.signup);
 
 /**
  * @method - POST
  * @param - /api/logout
  * @description - Logout
  */
-router.post("/logout", authCheck, logout);
+router.post("/logout", requireAuthentication, usersController.logout);
 
 /**
  * @method - POST
  * @param - /api/master-logout
  * @description - Logout from all devices
  */
-router.post("/master-logout", authCheck, logoutAllDevices);
+router.post(
+  "/master-logout",
+  requireAuthentication,
+  usersController.logoutAllDevices
+);
 
 /**
  * @method - POST
  * @param - /api/reauth
  * @description - Regenerate Access Token
  */
-router.post("/reauth", refreshAccessToken);
+router.post("/reauth", usersController.refreshAccessToken);
 
 /**
  * @method - POST
  * @param - /api/forgotpass
  * @description - Send password reset email link
  */
-router.post("/forgotpass", validators.forgotPasswordValidator, forgotPassword);
+router.post(
+  "/forgotpass",
+  validators.forgotPasswordValidator,
+  usersController.forgotPassword
+);
 
 /**
  * @method - POST
@@ -75,26 +68,30 @@ router.post("/forgotpass", validators.forgotPasswordValidator, forgotPassword);
 router.patch(
   "/resetpass/:resetToken",
   validators.resetPasswordValidator,
-  resetPassword
+  usersController.resetPassword
 );
 
 /**
  * @method - GET
- * @param - /user/me
- * @description - Fetch profile of authenticated user
+ * @param - /api/users/me
+ * @description - Get authenticated user
  */
-router.get("/user/me", authCheck, fetchAuthUserProfile);
+router.get(
+  "/users/me",
+  requireAuthentication,
+  usersController.fetchAuthUserProfile
+);
 
 /**
  * @method - GET
- * @param - /user/:id
- * @description - Fetch user profile by ID
+ * @param - /api/users/:id
+ * @description - Get user by ID
  */
 router.get(
-  "/user/:id",
-  authCheck,
+  "/users/:id",
+  requireAuthentication,
   validators.fetchUserProfileValidator,
-  fetchUserProfile
+  usersController.fetchUserProfile
 );
 
 module.exports = router;
