@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const connURI = process.env.MONGODB_CLOUD;
+const connURI = process.env.MONGODB_URI;
 
 /**
  * Connect to MongoDB via Mongoose
