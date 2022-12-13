@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const connURI = process.env.MONGODB_URI;
 
-/**
- * Connect to MongoDB via Mongoose
- */
+mongoose.set("strictQuery", false);
+
+// Connect to MongoDB
 mongoose.connect(connURI);
 
 const db = mongoose.connection;

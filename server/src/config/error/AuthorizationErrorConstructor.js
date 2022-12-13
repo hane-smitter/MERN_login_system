@@ -1,4 +1,4 @@
-const CustomError = require("./customErrorConstructor");
+const CustomError = require("./CustomErrorConstructor");
 
 class AuthorizationError extends CustomError {
   /**

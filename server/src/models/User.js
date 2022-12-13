@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const crypto = require("node:crypto");
+const crypto = require("crypto");
 
-const CustomError = require("../config/error/customErrorConstructor");
+const CustomError = require("../config/error/CustomErrorConstructor");
 
-// ENV Vars
+// Pull in Environment variables
 const ACCESS_TOKEN = {
   secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
   expiry: process.env.AUTH_ACCESS_TOKEN_EXPIRY,
@@ -40,7 +40,6 @@ const UserSchema = new User({
 UserSchema.set("toJSON", {
   virtuals: true,
   transform: function (doc, ret, options) {
-    // remove the property(s) of every document before returning the result
     delete ret.password;
     delete ret.tokens;
     return ret;
@@ -49,15 +48,12 @@ UserSchema.set("toJSON", {
 
 UserSchema.pre("save", async function (next) {
   try {
-    // Only hash Password if it has been Modified
     if (this.isModified("password")) {
       const salt = await bcrypt.genSalt(10);
       this.password = await bcrypt.hash(this.password, salt);
     }
     next();
   } catch (error) {
-    // If you call `next()` with an argument, that argument is assumed to be
-    // an error
     next(error);
   }
 });
@@ -65,12 +61,13 @@ UserSchema.pre("save", async function (next) {
 UserSchema.statics.findByCredentials = async (email, password) => {
   const user = await UserModel.findOne({ email });
   if (!user)
-    throw new CustomError("Wrong credentials!", 400, "Wrong credentials!");
+    throw new CustomError("Wrong credentials!", 400, "Email or password is wrong!");
   const passwdMatch = await bcrypt.compare(password, user.password);
   if (!passwdMatch)
-    throw new CustomError("Wrong credentials!!", 400, "Wrong credentials!!");
+    throw new CustomError("Wrong credentials!!", 400, "Email or password is wrong!");
   return user;
 };
+
 // Generates Access token and saves it in the DB before returning it
 UserSchema.methods.generateAcessToken = async function () {
   const accessToken = jwt.sign(
@@ -105,35 +102,23 @@ UserSchema.methods.generateRefreshToken = function () {
 };
 
 UserSchema.methods.generateResetToken = async function () {
-/* 
-Again to reiterate hashes aren't designed to be decrypted.
-However once you have a hash you can check any string is equal
-to that hash by putting it through the same encryption with the same secret.
-*/
-
-// Read about base64url: [https://www.rfc-editor.org/rfc/rfc4648#section-5]
-
   const resetTokenValue = crypto.randomBytes(40).toString("base64url");
-
   const resetTokenSecret = crypto.randomBytes(15).toString("hex");
 
-  const resetToken = `${resetTokenValue}+${resetTokenSecret}`; // Separator of `+` since base64url doesnt include this character
+   // Separator of `+` since base64url doesnt include this character
+  const resetToken = `${resetTokenValue}+${resetTokenSecret}`;
 
-  // 1. Create Hash of the resetTokenValue with a secret(`resetTokenSecret`)
   const resetTokenHash = crypto
     .createHmac("sha256", resetTokenSecret)
     .update(resetTokenValue)
     .digest("hex");
 
-  // 2. Create DB entry
   this.resetpasswordtoken = resetTokenHash;
   this.resetpasswordtokenexpiry =
     Date.now() + (RESET_PASSWORD_TOKEN.expiry || 5) * 60 * 1000;
 
-  // 3. Save
   await this.save();
 
-  // 4. Return the reset token(unencrypted)
   return resetToken;
 };
 

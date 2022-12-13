@@ -11,9 +11,9 @@
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
-const AutorizationError = require("../../config/error/AuthorizationErrorConstructor");
+const AuthorizationError = require("../../config/error/AuthorizationErrorConstructor");
 
-const CustomError = require("../../config/error/customErrorConstructor");
+const CustomError = require("../../config/error/CustomErrorConstructor");
 const User = require("../../models/User");
 const { sendEmail } = require("../../services/email/sendEmail");
 
@@ -132,7 +132,7 @@ module.exports.refreshAccessToken = async (req, res, next) => {
     console.log(err);
     if (err?.name === "JsonWebTokenError") {
       return next(
-        new AutorizationError(err, "You are not properly authenticated", {
+        new AuthorizationError(err, "You are not properly authenticated", {
           error_desc: "missing token",
         })
       );

@@ -21,29 +21,30 @@ app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 
 // Parse requests with Content-Type application/json
-// so that data is available on req body
+// so that data is available on req.body
 app.use(express.json());
 
 // Parse requests with Cookie header
-// so that data is available on req body
+// so that data is available on req.cookie
 app.use(cookieParser());
 
+// Test route
 app.get("/", function (req, res) {
-  res.send("Hello Welcome to API !!");
+  res.send("Hello Welcome to API🙃 !!");
 });
 
 // Routes for our application
 app.use("/api", routes);
 
-// Fail gracefully request for routes not on the server
-// on all http methods
+// Fail gracefully for all HTTP Methods when unregistered route
+// hits our server
 app.all("*", function (req, res, next) {
   // Trigger a 404
   // We're not responding here
   next();
 });
 
-// NoN-Error handling Middleware
+// NoN-Error 404 handler Middleware
 app.use(LostErrorHandler);
 
 // Error handling Middleware

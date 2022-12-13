@@ -2,11 +2,9 @@ const express = require("express");
 
 const usersController = require("../controllers/user");
 const { requireAuthentication } = require("../middlewares/authCheck");
-const validators = require("../validator");
+const validators = require("../validators");
 
 const router = express.Router();
-
-router.use("/users", (req, res, next) => next());
 
 router.get("/test", function (req, res) {
   res.send("Hello its working!!");
