@@ -13,7 +13,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
 const AutorizationError = require("../../config/error/AuthorizationErrorConstructor");
 
-const CustomError = require("../../config/error/customErrorConstructor");
+const CustomError = require("../../config/error/CustomErrorConstructor");
 const User = require("../../models/User");
 const { sendEmail } = require("../../services/email/sendEmail");
 

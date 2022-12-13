@@ -7,7 +7,6 @@ function LostErrorHandler(req, res, next) {
 }
 
 function AppErrorHandler(err, req, res, next) {
-  // console.log(err)
   res.status(err.status || 500);
 
   if (err.authorizationError === true) {
@@ -17,7 +16,7 @@ function AppErrorHandler(err, req, res, next) {
   // any data type for an error other than just string
   const error = err?.cause || err?.message;
   const providedFeedback = err?.feedback;
-  res.getHeaderNames();
+  // res.getHeaderNames();
   res.json({ error, ...(providedFeedback && { feedback: providedFeedback }) });
 }
 

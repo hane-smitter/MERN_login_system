@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
 
-const CustomError = require("../config/error/customErrorConstructor");
+const CustomError = require("../config/error/CustomErrorConstructor");
 
 // ENV Vars
 const ACCESS_TOKEN = {
