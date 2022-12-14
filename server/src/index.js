@@ -36,8 +36,8 @@ app.get("/", function (req, res) {
 // Routes for our application
 app.use("/api", routes);
 
-// Fail gracefully request for routes not registered on the server
-// on all http methods
+// Fail gracefully for all HTTP Methods when unregistered route
+// hits our server
 app.all("*", function (req, res, next) {
   // Trigger a 404
   // We're not responding here
