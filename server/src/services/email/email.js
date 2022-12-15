@@ -1,32 +1,30 @@
-"use strict";
 const nodemailer = require("nodemailer");
 
-const emailUserName = process.env.AUTH_EMAIL_USERNAME;
-const emailUserPassword = process.env.AUTH_EMAIL_PASSWORD;
+// Pull in Environments variables
+const EMAIL = {
+  authUser: process.env.AUTH_EMAIL_USERNAME,
+  authPass: process.env.AUTH_EMAIL_PASSWORD,
+};
 
 async function main(mailOptions) {
-  // create reusable transporter object using the default SMTP transport
+  // Create reusable transporter object using the default SMTP transport
   const transporter = nodemailer.createTransport({
     host: "smtp.mailtrap.io",
     port: 2525,
     auth: {
-      user: emailUserName,
-      pass: emailUserPassword,
+      user: EMAIL.authUser,
+      pass: EMAIL.authPass,
     },
   });
 
   // Send mail with defined transport object
   const info = await transporter.sendMail({
-    from: mailOptions?.from, // sender address
-    to: mailOptions?.to, // list of receivers
-    subject: mailOptions?.subject, // Subject line
-    text: mailOptions?.text, // plain text body
-    html: mailOptions?.html, // html body
+    from: mailOptions?.from,
+    to: mailOptions?.to,
+    subject: mailOptions?.subject,
+    text: mailOptions?.text,
+    html: mailOptions?.html,
   });
-
-  // console.log("Message sent: %s", info.messageId);
-
-  // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 
   return info;
 }

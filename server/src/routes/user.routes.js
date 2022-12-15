@@ -6,8 +6,9 @@ const validators = require("../validators");
 
 const router = express.Router();
 
+// TEST Route
 router.get("/test", function (req, res) {
-  res.send("Hello its working!!");
+  res.send("Hello /api routing works 🥂!!");
 });
 
 /**

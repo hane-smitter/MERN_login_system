@@ -18,7 +18,6 @@ const User = require("../../models/User");
 const { sendEmail } = require("../../services/email/sendEmail");
 
 const RESET_PASSWORD_TOKEN = {
-  secret: process.env.RESET_PASSWORD_TOKEN_SECRET,
   expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
 };
 
@@ -313,7 +312,7 @@ module.exports.forgotPassword = async (req, res, next) => {
               <small>
                 <em>
                   This password reset link will <strong>expire after ${
-                    process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS || 5
+                    RESET_PASSWORD_TOKEN.expiry || 5
                   } minutes.</strong>
                 </em>
               <small/>

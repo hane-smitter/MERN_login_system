@@ -15,7 +15,6 @@ const REFRESH_TOKEN = {
   expiry: process.env.AUTH_REFRESH_TOKEN_EXPIRY,
 };
 const RESET_PASSWORD_TOKEN = {
-  secret: process.env.RESET_PASSWORD_TOKEN_SECRET,
   expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
 };
 
