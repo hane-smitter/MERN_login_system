@@ -6,7 +6,6 @@ const fixedMailOptions = {
 
 function sendEmail(options = {}) {
   const mailOptions = Object.assign({}, options, fixedMailOptions);
-  // ✔
   return main(mailOptions);
 }
 

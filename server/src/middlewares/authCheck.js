@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const AuthorizationError = require("../config/error/AuthorizationErrorConstructor.js");
 const User = require("../models/User.js");
 
+// Pull in Environment variables
 const ACCESS_TOKEN = {
   secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
 };
@@ -18,12 +19,11 @@ module.exports.requireAuthentication = async (req, res, next) => {
     const authHeader = req.header("Authorization");
     if (!authHeader?.startsWith("Bearer "))
       throw new AuthorizationError(
-        "Invalid Access Token!",
-        "You are unauthorized!",
+        "Authentication Error",
+        "You are unauthenticated!",
         {
-          realm: "appp",
-          error: "no_auth_token",
-          error_description: "missing access token",
+          error: "invalid_access_token",
+          error_description: "access token error",
         }
       );
 
@@ -38,24 +38,43 @@ module.exports.requireAuthentication = async (req, res, next) => {
       // Rethrow error so it is captured by the outer catch block
 
       if (error.name === "TokenExpiredError") {
-        throw new AuthorizationError("Invalid Access Token!", "Unauthorized", {
-          error: "invalid_token",
-          error_description: "access token expired",
-        });
+        throw new AuthorizationError(
+          "Authentication Error",
+          "You are unauthenticated!",
+          {
+            error: "expired_access_token",
+            error_description: "access token is expired",
+          }
+        );
       }
 
-      throw new AuthorizationError("Invalid Access Token!", "Unauthorized");
+      throw new AuthorizationError(
+        "Authentication Error",
+        "You are unauthenticated!"
+      );
     }
 
-    if (!user) throw new AuthorizationError("No record", "Unauthorized");
+    if (!user)
+      throw new AuthorizationError(
+        "Authentication Error",
+        "You are unauthenticated!",
+        {
+          error: "entity_miss",
+          error_description: "unknown access token",
+        }
+      );
 
     const accessTknExists = user.tokens.findIndex(
       (tokenObj) => tokenObj.token === accessTkn
     );
     if (accessTknExists === -1)
       throw new AuthorizationError(
-        "Unauthorized. Provided AT not found",
-        "Unauthorized"
+        "Authentication Error",
+        "You are unauthenticated!",
+        {
+          error: "unclaimed_access_token",
+          error_description: "forsaken access token",
+        }
       );
 
     // Attach authenticated user and Access Token to request object
@@ -63,7 +82,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
     req.token = accessTkn;
     next();
   } catch (err) {
-    // Things didn't go well
+    // Authentication didn't go well
     console.log(err);
     next(err);
   }
