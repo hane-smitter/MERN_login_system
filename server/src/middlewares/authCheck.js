@@ -23,7 +23,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
         "You are unauthenticated!",
         {
           error: "invalid_access_token",
-          error_description: "missing access token",
+          error_description: "access token error",
         }
       );
 
