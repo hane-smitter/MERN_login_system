@@ -3,12 +3,12 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
-const { db } = require("./dbConn/mongoose/mongoose.js");
-const routes = require("./routes");
 const {
   AppErrorHandler,
   LostErrorHandler,
 } = require("./config/exceptions/errorHandler.js");
+const routes = require("./routes");
+const { db } = require("./dbConn/mongoose/mongoose.js");
 const corsOptions = require("./config/cors/cors.js");
 
 /* 
@@ -20,16 +20,11 @@ const PORT = process.env.PORT || 8000;
 /* 
   2. APPLICATION MIDDLEWARES AND CUSTOMIZATIONS 🪛
 */
-app.disable("x-powered-by");
-// Enable Cross Origin Resource Sharing
-app.use(cors(corsOptions));
+app.disable("x-powered-by"); // Disable X-Powered-By header in responses
+app.use(express.json()); // Parse requests with Content-Type application/json
+app.use(cookieParser()); // Parse requests with Cookie header
+app.use(cors(corsOptions)); // Enable Cross Origin Resource Sharing
 app.options("*", cors(corsOptions));
-// Parse requests with Content-Type application/json
-// so data is available on req.body
-app.use(express.json());
-// Parse requests with Cookie header
-// so data is available on req.cookie
-app.use(cookieParser());
 
 /* 
   3. APPLICATION ROUTES 🛣️
@@ -38,21 +33,18 @@ app.use(cookieParser());
 app.get("/", function (req, res) {
   res.send("Hello Welcome to API🙃 !!");
 });
-// modular routes
-app.use("/api", routes);
+app.use("/api", routes); // modular routes
 
 /* 
   4. APPLICATION ERROR HANDLING 🚔
 */
 // Handle unregistered route
 app.all("*", function (req, res, next) {
-  // Forward to `LostErrorHandler`
+  // Forward to next closest middleware
   next();
 });
-// 404 error handler middleware
-app.use(LostErrorHandler);
-// General app error handler
-app.use(AppErrorHandler);
+app.use(LostErrorHandler); // 404 error handler middleware
+app.use(AppErrorHandler); // General app error handler
 
 /* 
   5. APPLICATION BOOT UP 🖥️
