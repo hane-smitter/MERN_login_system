@@ -2,7 +2,7 @@ const { validationResult } = require("express-validator");
 const CustomError = require("../../config/error/CustomErrorConstructor");
 const User = require("../../models/User");
 
-/* FETCH USER PROFILE */
+/* FETCH USER PROFILE BY ID */
 module.exports.fetchUserProfile = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -11,7 +11,6 @@ module.exports.fetchUserProfile = async (req, res, next) => {
     }
 
     const userId = req.params.id;
-
     const retrievedUser = await User.findById(userId);
 
     res.json({

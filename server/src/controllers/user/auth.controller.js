@@ -276,9 +276,12 @@ module.exports.forgotPassword = async (req, res, next) => {
     if (!user) throw new CustomError("Email not sent", 404);
 
     const resetToken = await user.generateResetToken();
+    const resetPath = req.header("X-reset-base");
     const origin = req.header("Origin");
 
-    const resetUrl = `${origin}/resetpass/${resetToken}`;
+    const resetUrl = resetPath
+      ? `${resetPath}/${resetToken}`
+      : `${origin}/resetpass/${resetToken}`;
     console.log("Password reset URL: %s", resetUrl);
 
     const message = `
