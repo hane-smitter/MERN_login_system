@@ -49,7 +49,7 @@ app.use(AppErrorHandler); // General app error handler
 /* 
   5. APPLICATION BOOT UP 🖥️
 */
-db.once("open", () => {
+db.then(() => {
   console.log("---Database is connected !!---");
   app.emit("ready");
 });
