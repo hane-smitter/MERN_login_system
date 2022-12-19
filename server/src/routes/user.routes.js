@@ -7,7 +7,7 @@ const { requireAuthentication } = require("../middlewares/authCheck");
 const router = express.Router();
 
 // TEST Route
-router.get("/test", function (req, res) {
+router.get("/", function (req, res) {
   res.send("Hello /api/users routing works 🥂!!");
 });
 

@@ -4,12 +4,10 @@ const connURI = process.env.MONGODB_URI;
 
 mongoose.set("strictQuery", false);
 
-// Connect to MongoDB
-mongoose.connect(connURI);
+// Connect to MongoDB and store connection in variable
+const db = mongoose.connect(connURI);
 
-const db = mongoose.connection;
-
-db.on("error", (err) => {
+db.catch((err) => {
   if (err.message.code === "ETIMEDOUT") {
     console.log(`----${err.message.code}----`);
     // console.log(err);
