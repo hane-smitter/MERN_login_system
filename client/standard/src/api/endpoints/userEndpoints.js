@@ -6,4 +6,4 @@ import http from "../../utils/standardHttp";
  * @returns {Promise} - Axios promise object
  */
 export const getUserProfile = () =>
-  http.get(`/user/me`, { requireAuthHeader: true });
+  http.get(`/me`, { requireAuthHeader: true });

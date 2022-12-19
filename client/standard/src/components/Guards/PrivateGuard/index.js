@@ -38,6 +38,8 @@ const PrivateRoute = () => {
         .then((response) => {
           const user = response.data?.user;
           dispatch(addAuthUser({ user }));
+        })
+        .finally(() => {
           setViewPage(true);
         });
     } else {

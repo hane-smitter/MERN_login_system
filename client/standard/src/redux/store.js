@@ -13,23 +13,13 @@ const store = configureStore({
   },
 });
 
-window.addEventListener("beforeunload", () => {
-  const userAuthToken = store.getState().auth.token;
-  if (userAuthToken) {
-    browserStorage.setAuthTkn = userAuthToken;
-  }
-});
-
 function persistState(state) {
-  const userAuthToken = state.auth.token;
+  const userAuthToken = state?.auth?.token;
   if (userAuthToken) {
     browserStorage.setAuthTkn = userAuthToken;
-  } else {
-    browserStorage.deleteAuthTkn();
   }
 }
 
-// store.subscribe(() => {
-//   persistState(store.getState());
-// });
+window.addEventListener("beforeunload", () => persistState(store.getState()));
+
 export default store;

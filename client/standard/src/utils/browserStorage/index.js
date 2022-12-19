@@ -1,6 +1,9 @@
 const storage = sessionStorage;
 
 const browserStorage = {
+  /**
+   * @returns {string|undefined} - Access Token
+   */
   get authTkn() {
     let token = storage.getItem("u:Id");
 
@@ -10,6 +13,10 @@ const browserStorage = {
 
     return token;
   },
+  /**
+   * @param {string} token - Access Token
+   * @returns {void}
+   */
   set setAuthTkn(token) {
     storage.setItem("u:Id", JSON.stringify(token));
   },
