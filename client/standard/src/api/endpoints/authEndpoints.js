@@ -95,7 +95,12 @@ export const logoutEverywhere = () =>
  * @param {string} data.email - Email used by the account
  * @returns {Promise} - Axios promise object
  */
-export const forgotpass = (data) => http.post("/forgotpass", data);
+export const forgotpass = (data) =>
+  http.post("/forgotpass", data, {
+    headers: {
+      "X-reset-base": `${process.env.PUBLIC_URL}/restee`,
+    },
+  });
 
 /**
  * Reset password API endpoint
