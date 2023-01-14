@@ -275,7 +275,9 @@ module.exports.forgotPassword = async (req, res, next) => {
     const user = await User.findOne({ email });
     if (!user) throw new CustomError("Email not sent", 404);
 
-    const resetToken = await user.generateResetToken();
+    let resetToken = await user.generateResetToken();
+    resetToken = encodeURIComponent(resetToken);
+
     const resetPath = req.header("X-reset-base");
     const origin = req.header("Origin");
 
@@ -325,6 +327,8 @@ module.exports.forgotPassword = async (req, res, next) => {
       user.resetpasswordtoken = undefined;
       user.resetpasswordtokenexpiry = undefined;
       await user.save();
+
+      console.log(error.message);
       throw new CustomError("Email not sent", 500);
     }
   } catch (err) {
@@ -345,7 +349,7 @@ module.exports.resetPassword = async (req, res, next) => {
 
     const resetToken = String(req.params.resetToken);
 
-    const [tokenValue, tokenSecret] = resetToken.split("+");
+    const [tokenValue, tokenSecret] = decodeURIComponent(resetToken).split("+");
 
     console.log({ tokenValue, tokenSecret });
 

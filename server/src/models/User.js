@@ -101,10 +101,10 @@ UserSchema.methods.generateRefreshToken = function () {
 };
 
 UserSchema.methods.generateResetToken = async function () {
-  const resetTokenValue = crypto.randomBytes(40).toString("base64url");
-  const resetTokenSecret = crypto.randomBytes(15).toString("hex");
+  const resetTokenValue = crypto.randomBytes(20).toString("base64url");
+  const resetTokenSecret = crypto.randomBytes(10).toString("hex");
 
-   // Separator of `+` since base64url doesnt include this character
+   // Separator of `+` because generated base64url characters doesnt include this character
   const resetToken = `${resetTokenValue}+${resetTokenSecret}`;
 
   const resetTokenHash = crypto

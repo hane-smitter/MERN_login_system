@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e4ab313b-d7d8-4ebc-a403-cbc7ea03b154",
+		"_postman_id": "e6cab358-ac55-4b6b-ac26-5cf0ce966570",
 		"name": "MERN Login System",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -9,7 +9,13 @@
 			"name": "login",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Origin",
+						"value": "http://localhost:8000",
+						"type": "default"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"email\": \"hanesmitter918@gmail.com\",\n    \"password\": \"smart1234\"\n}",
@@ -20,7 +26,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/login",
+					"raw": "http://localhost:8000/api/users/login",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -28,6 +34,7 @@
 					"port": "8000",
 					"path": [
 						"api",
+						"users",
 						"login"
 					]
 				}
@@ -49,7 +56,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/signup",
+					"raw": "http://localhost:8000/api/users/signup",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -57,6 +64,7 @@
 					"port": "8000",
 					"path": [
 						"api",
+						"users",
 						"signup"
 					]
 				}
@@ -79,7 +87,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/logout",
+					"raw": "http://localhost:8000/api/users/logout",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -87,6 +95,7 @@
 					"port": "8000",
 					"path": [
 						"api",
+						"users",
 						"logout"
 					]
 				}
@@ -106,7 +115,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [
 					{
 						"key": "Cookie",
@@ -116,7 +125,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:8000/api/reauth",
+					"raw": "http://localhost:8000/api/users/reauth",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -124,6 +133,7 @@
 					"port": "8000",
 					"path": [
 						"api",
+						"users",
 						"reauth"
 					]
 				}
@@ -136,14 +146,14 @@
 				"method": "POST",
 				"header": [
 					{
-						"key": "Origin",
-						"value": "postman-env-testing.app",
+						"key": "",
+						"value": "",
 						"type": "default"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"hanesmitter918@gmail.com\"\n}",
+					"raw": "{\n    \"email\": \"moki@mail.com\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -151,7 +161,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/forgotpass",
+					"raw": "http://localhost:8000/api/users/forgotpass",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -159,10 +169,11 @@
 					"port": "8000",
 					"path": [
 						"api",
+						"users",
 						"forgotpass"
 					]
 				},
-				"description": "Email a password reset link if user is found"
+				"description": "Send a password reset link to email of the requesting user"
 			},
 			"response": []
 		},
@@ -172,7 +183,7 @@
 				"method": "PATCH",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/resetpass/hdfjgbnsdsjdggjskqacacqmc",
+					"raw": "http://localhost:8000/api/users/resetpass/hdfjgbnsdsjdggjskqacacqmc",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -180,12 +191,73 @@
 					"port": "8000",
 					"path": [
 						"api",
+						"users",
 						"resetpass",
 						"hdfjgbnsdsjdggjskqacacqmc"
 					]
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get profile of authenticated user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzZhN2I3MGMyYzE1ZGNmNmQ2MWZjMmMiLCJmdWxsTmFtZSI6IkVsaSBXZW5kbyIsImVtYWlsIjoiaGFuZXNtaXR0ZXI5MThAZ21haWwuY29tIiwiaWF0IjoxNjY5OTkxOTY5LCJleHAiOjE2Njk5OTI5Njl9.H1H2M98_9kDEs0pcZk3ad23kDnVlpVzo7Zf5Whm0Rw0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "http://localhost:8000",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/users/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"me"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.request.headers.add({",
+					"    key: \"Origin\",",
+					"    value: \"http://localhost:8000\"",
+					"})"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
