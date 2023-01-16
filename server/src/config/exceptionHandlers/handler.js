@@ -1,3 +1,4 @@
+// 404 Error Handler
 function LostErrorHandler(req, res, next) {
   res.status(404);
 
@@ -6,17 +7,21 @@ function LostErrorHandler(req, res, next) {
   });
 }
 
+// Exception Handler
 function AppErrorHandler(err, req, res, next) {
   res.status(err.status || 500);
 
   if (err.authorizationError === true) {
+    // Sets headers available in Authorization Error object
     res.set(err.authHeaders);
   }
-  // err?.cause is a custom set error payload that can contain
-  // any data type for an error other than just string
+
+  // `cause` is a custom property on error object
+  // that can hold any data type
   const error = err?.cause || err?.message;
   const providedFeedback = err?.feedback;
-  // res.getHeaderNames();
+
+  // respond with error and conditionally include feedback if provided
   res.json({ error, ...(providedFeedback && { feedback: providedFeedback }) });
 }
 

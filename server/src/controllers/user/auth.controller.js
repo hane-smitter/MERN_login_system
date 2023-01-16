@@ -1,21 +1,11 @@
-/*
- - Route handlers to create:
-    - Refresh Access Token
-    - Login
-    - Signup
-    - Logout - remember to expire the refresh token
-              - To logout, remove the access token from DB along with client side
-    - Password Reset
- */
-
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
 const User = require("../../models/User");
 const { sendEmail } = require("../../services/email/sendEmail");
-const CustomError = require("../../config/error/CustomErrorConstructor");
-const AuthorizationError = require("../../config/error/AuthorizationErrorConstructor");
+const CustomError = require("../../config/errors/CustomError");
+const AuthorizationError = require("../../config/errors/AuthorizationError");
 
 // Top-level constants
 const REFRESH_TOKEN = {

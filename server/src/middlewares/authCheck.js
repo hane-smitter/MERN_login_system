@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const AuthorizationError = require("../config/error/AuthorizationErrorConstructor.js");
+const AuthorizationError = require("../config/errors/AuthorizationError.js");
 const User = require("../models/User.js");
 
 // Pull in Environment variables

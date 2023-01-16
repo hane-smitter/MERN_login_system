@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator");
-const CustomError = require("../../config/error/CustomErrorConstructor");
+const CustomError = require("../../config/errors/CustomError");
 const User = require("../../models/User");
 
 /* FETCH USER PROFILE BY ID */

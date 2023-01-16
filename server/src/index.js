@@ -6,10 +6,11 @@ const cors = require("cors");
 const {
   AppErrorHandler,
   LostErrorHandler,
-} = require("./config/exceptions/errorHandler.js");
+} = require("./config/exceptionHandlers/handler.js");
 const routes = require("./routes");
 const { db } = require("./dbConn/mongoose/mongoose.js");
 const corsOptions = require("./config/cors/cors.js");
+const CustomError = require("./config/errors/CustomError.js");
 
 /* 
   1. INITIALIZE EXPRESS APPLICATION 🏁
@@ -33,12 +34,21 @@ app.options("*", cors(corsOptions));
 app.get("/", function (req, res) {
   res.send("Hello Welcome to API🙃 !!");
 });
-app.use("/api", routes); // modular routes
+// Test Crash route
+app.get("/boom", function (req, res, next) {
+  try {
+    throw new CustomError("Oops! matters are chaotic💥", 400);
+  } catch (error) {
+    next(error);
+  }
+});
+// App modular routes
+app.use("/api", routes);
 
 /* 
   4. APPLICATION ERROR HANDLING 🚔
 */
-// Handle unregistered route
+// Handle unregistered route for all HTTP Methods
 app.all("*", function (req, res, next) {
   // Forward to next closest middleware
   next();

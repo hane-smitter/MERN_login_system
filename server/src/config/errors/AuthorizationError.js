@@ -1,4 +1,4 @@
-const CustomError = require("./CustomErrorConstructor");
+const CustomError = require("./CustomError");
 
 class AuthorizationError extends CustomError {
   /**
@@ -35,13 +35,14 @@ class AuthorizationError extends CustomError {
       }
 
       let comma = ",";
+      // If is last Item
       if (array.length - 1 === index) {
         comma = "";
       }
       str = str + ` ${authParam}=${this.authParams[authParam]}${comma}`;
     });
 
-    console.log("--Authenticate header string returned: -- ", str);
+    // console.log("--Authenticate header string returned: -- ", str);
 
     return str;
   }
