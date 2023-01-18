@@ -35,7 +35,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
       const decoded = jwt.verify(accessTkn, ACCESS_TOKEN.secret);
       user = await User.findById(decoded._id);
     } catch (error) {
-      // Rethrow error so it is captured by the outer catch block
+      // Rethrow error so it is captured by the outer `catch() {...}` block
 
       if (error.name === "TokenExpiredError") {
         throw new AuthorizationError(

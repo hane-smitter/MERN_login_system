@@ -42,7 +42,7 @@ class AuthorizationError extends CustomError {
       str = str + ` ${authParam}=${this.authParams[authParam]}${comma}`;
     });
 
-    // console.log("--Authenticate header string returned: -- ", str);
+    // console.log("--Authenticate header string constructed: -- ", str);
 
     return str;
   }

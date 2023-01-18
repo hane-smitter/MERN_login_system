@@ -18,8 +18,10 @@ const RESET_PASSWORD_TOKEN = {
   expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
 };
 
+/* 
+1. CREATE USER SCHEMA
+ */
 const User = mongoose.Schema;
-
 const UserSchema = new User({
   firstName: { type: String, required: [true, "First name is required"] },
   lastName: { type: String, required: [true, "Last name is required"] },
@@ -36,6 +38,10 @@ const UserSchema = new User({
   resetpasswordtoken: String,
   resetpasswordtokenexpiry: Date,
 });
+
+/* 
+2. SET SCHEMA OPTION
+ */
 UserSchema.set("toJSON", {
   virtuals: true,
   transform: function (doc, ret, options) {
@@ -45,6 +51,9 @@ UserSchema.set("toJSON", {
   },
 });
 
+/* 
+3. ATTACH MIDDLEWARE
+ */
 UserSchema.pre("save", async function (next) {
   try {
     if (this.isModified("password")) {
@@ -57,39 +66,60 @@ UserSchema.pre("save", async function (next) {
   }
 });
 
+/* 
+4. ATTACH CUSTOM STATIC METHODS
+ */
 UserSchema.statics.findByCredentials = async (email, password) => {
   const user = await UserModel.findOne({ email });
   if (!user)
-    throw new CustomError("Wrong credentials!", 400, "Email or password is wrong!");
+    throw new CustomError(
+      "Wrong credentials!",
+      400,
+      "Email or password is wrong!"
+    );
   const passwdMatch = await bcrypt.compare(password, user.password);
   if (!passwdMatch)
-    throw new CustomError("Wrong credentials!!", 400, "Email or password is wrong!");
+    throw new CustomError(
+      "Wrong credentials!!",
+      400,
+      "Email or password is wrong!"
+    );
   return user;
 };
 
-// Generates Access token and saves it in the DB before returning it
+/* 
+5. ATTACH CUSTOM INSTANCE METHODS
+ */
 UserSchema.methods.generateAcessToken = async function () {
+  const user = this;
+
+  // Create signed access token
   const accessToken = jwt.sign(
     {
-      _id: this._id.toString(),
-      fullName: `${this.firstName} ${this.lastName}`,
-      email: this.email,
+      _id: user._id.toString(),
+      fullName: `${user.firstName} ${user.lastName}`,
+      email: user.email,
     },
     ACCESS_TOKEN.secret,
     {
       expiresIn: ACCESS_TOKEN.expiry,
     }
   );
-  this.tokens.push({ token: accessToken });
-  await this.save();
+
+  // Save to database
+  user.tokens.push({ token: accessToken });
+  await user.save();
 
   return accessToken;
 };
 
 UserSchema.methods.generateRefreshToken = function () {
+  const user = this;
+
+  // Create signed refresh token
   const refreshToken = jwt.sign(
     {
-      _id: this._id.toString(),
+      _id: user._id.toString(),
     },
     REFRESH_TOKEN.secret,
     {
@@ -103,25 +133,29 @@ UserSchema.methods.generateRefreshToken = function () {
 UserSchema.methods.generateResetToken = async function () {
   const resetTokenValue = crypto.randomBytes(20).toString("base64url");
   const resetTokenSecret = crypto.randomBytes(10).toString("hex");
+  const user = this;
 
-   // Separator of `+` because generated base64url characters doesnt include this character
+  // Separator of `+` because generated base64url characters don't include this character
   const resetToken = `${resetTokenValue}+${resetTokenSecret}`;
 
+  // Create a hash
   const resetTokenHash = crypto
     .createHmac("sha256", resetTokenSecret)
     .update(resetTokenValue)
     .digest("hex");
 
-  this.resetpasswordtoken = resetTokenHash;
-  this.resetpasswordtokenexpiry =
-    Date.now() + (RESET_PASSWORD_TOKEN.expiry || 5) * 60 * 1000;
+  user.resetpasswordtoken = resetTokenHash;
+  user.resetpasswordtokenexpiry =
+    Date.now() + (RESET_PASSWORD_TOKEN.expiry || 5) * 60 * 1000; // Sets expiration age
 
-  await this.save();
+  await user.save();
 
   return resetToken;
 };
 
-// Compile model from schema
+/* 
+6. COMPILE MODEL FROM SCHEMA
+ */
 const UserModel = mongoose.model("User", UserSchema);
 
 module.exports = UserModel;

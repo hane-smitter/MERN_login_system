@@ -13,9 +13,9 @@ const REFRESH_TOKEN = {
   cookie: {
     name: "refreshTkn",
     options: {
-      httpOnly: false,
       sameSite: "None",
       secure: true,
+      httpOnly: false,
       maxAge: 24 * 60 * 60 * 1000,
     },
   },
@@ -40,7 +40,7 @@ module.exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
     /* Custom methods on user are defined in User model */
-    const user = await User.findByCredentials(email, password); // Identify user by credentials
+    const user = await User.findByCredentials(email, password); // Identify and retrieve user by credentials
     const accessToken = await user.generateAcessToken(); // Create Access Token
     const refreshToken = await user.generateRefreshToken(); // Create Refresh Token
 
@@ -104,6 +104,7 @@ module.exports.signup = async (req, res, next) => {
 */
 module.exports.logout = async (req, res, next) => {
   try {
+    // Authenticated user attached on `req` by authentication middleware
     const user = req.user;
 
     const aTkn = req.token;
@@ -135,6 +136,7 @@ module.exports.logout = async (req, res, next) => {
 */
 module.exports.logoutAllDevices = async (req, res, next) => {
   try {
+    // Authenticated user attached on `req` by authentication middleware
     const user = req.user;
 
     user.tokens = undefined;
@@ -337,7 +339,7 @@ module.exports.resetPassword = async (req, res, next) => {
       throw new CustomError(errors.array(), 422);
     }
 
-    const resetToken = String(req.params.resetToken);
+    const resetToken = new String(req.params.resetToken);
 
     const [tokenValue, tokenSecret] = decodeURIComponent(resetToken).split("+");
 

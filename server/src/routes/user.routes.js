@@ -46,7 +46,7 @@ router.post(
 /**
  * @method - POST
  * @param {string} path - /api/users/reauth
- * @description - Regenerate Access Token
+ * @description - Refresh Access Token
  */
 router.post("/reauth", userControllers.refreshAccessToken);
 
