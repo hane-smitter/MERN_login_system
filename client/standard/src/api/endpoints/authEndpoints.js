@@ -98,7 +98,7 @@ export const logoutEverywhere = () =>
 export const forgotpass = (data) =>
   http.post("/forgotpass", data, {
     headers: {
-      "X-reset-base": `${document.location.origin}/restee`,
+      "X-reset-base": `${document.location.origin}/change-pass`,
     },
   });
 

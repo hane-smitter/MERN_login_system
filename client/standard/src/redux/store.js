@@ -1,23 +1,21 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import todosReducer from "./slices/todosSlice";
-import feedbackSlice from "./slices/feedbackSlice";
-import authSlice from "./slices/authSlice";
-import { browserStorage } from "../utils/browserStorage";
+import notifyReducer from "./features/notify/notifySlice";
+import authReducer from "./features/auth/authSlice";
+import { authStorage } from "../utils/browserStorage";
 
 const store = configureStore({
   reducer: {
-    todos: todosReducer,
-    auth: authSlice,
-    feedback: feedbackSlice,
+    auth: authReducer,
+    notice: notifyReducer,
   },
 });
 
 function persistState(state) {
   const userAuthToken = state?.auth?.token;
-  if (userAuthToken) {
-    browserStorage.setAuthTkn = userAuthToken;
-  }
+
+  // Persist auth token in browser storage API
+  authStorage.authTkn = userAuthToken;
 }
 
 window.addEventListener("beforeunload", () => persistState(store.getState()));

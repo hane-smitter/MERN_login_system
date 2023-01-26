@@ -6,8 +6,8 @@ import {
   authTokenLoading,
   authUserLoading,
   authUserLogout,
-} from "../slices/authSlice";
-import { newFeedBack } from "../slices/feedbackSlice";
+} from "../features/auth/authSlice";
+import { newNotify } from "../features/notify/notifySlice";
 import { getUserProfile } from "./user";
 
 export function login(data) {
@@ -74,7 +74,7 @@ export function refreshAccessToken() {
       dispatch(addAuthToken({ token: accessToken }));
 
       // Load the user Profile
-      dispatch(getUserProfile(accessToken));
+      dispatch(getUserProfile());
     } catch (error) {
       if (error?.code === "ERR_CANCELED") {
         console.log("error.code: ", error?.code);
@@ -120,13 +120,13 @@ export function forgotPassword(data) {
       dispatch(authUserLoading({ loading: true }));
       const response = await API.forgotpass(data);
       dispatch(
-        newFeedBack({
+        newNotify({
           msg: "Your Password reset was successfully initiated. Please check your inbox for further instructions",
         })
       );
     } catch (error) {
       dispatch(
-        newFeedBack({
+        newNotify({
           msg: "Oops! We couldn't initiate a password reset at this time. Please try again later",
         })
       );
@@ -143,7 +143,7 @@ export function resetPassword(data) {
       dispatch(authUserLoading({ loading: true }));
       const response = await API.resetpass(data);
       dispatch(
-        newFeedBack({
+        newNotify({
           msg: "Your Password has been changed successfuly. Proceed to login with your new password",
           type: "success",
         })

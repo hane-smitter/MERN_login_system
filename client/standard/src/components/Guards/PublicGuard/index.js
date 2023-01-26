@@ -1,21 +1,20 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { authStorage } from "../../../utils/browserStorage";
 
 const PublicRoute = () => {
-  const user = useSelector((state) => state?.auth?.user);
+  const userIsAuthenticated =
+    useSelector((state) => state?.auth?.token) || authStorage.isAuthenticated;
   const location = useLocation();
 
-  const redirectedFrom = location?.state?.comingFrom;
-  const GOTO = redirectedFrom
-    ? `${redirectedFrom?.pathname}${redirectedFrom?.search}`
+  const originPath = location?.state?.comingFrom;
+  const targetPath = originPath
+    ? `${originPath?.pathname}${originPath?.search}`
     : "/home";
 
-  console.log("location in route guard;; ", location);
-
-  if (Object.keys(Object(user)).length > 0) {
-    console.log("User length > 0: ", user);
-    return <Navigate to={GOTO} state={{ comingFrom: location }} />;
+  if (userIsAuthenticated) {
+    return <Navigate to={targetPath} />;
   }
   return <Outlet />;
 };

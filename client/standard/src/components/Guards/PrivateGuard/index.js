@@ -1,64 +1,58 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserProfile, refreshAccessToken } from "../../../api";
-import { addAuthToken, addAuthUser } from "../../../redux/slices/authSlice";
 
-// import { refreshAccessToken } from "../../../redux/dispatchers";
+import { getUserProfile, refreshAccessToken } from "../../../api";
+import {
+  addAuthToken,
+  addAuthUser,
+} from "../../../redux/features/auth/authSlice";
+import { authStorage } from "../../../utils/browserStorage";
 
 const PrivateRoute = () => {
-  const [viewPage, setViewPage] = useState(false);
-  const {
-    user,
-    token,
-    token_loading: tknLoading,
-  } = useSelector((state) => state?.auth);
+  const token = useSelector((state) => state?.auth?.token);
+  const userIsAuthenticated = token || authStorage.isAuthenticated;
 
-  const location = useLocation();
+  const [displayPage, setDisplayPage] = useState(false);
+  const here = useLocation();
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   console.log("Considering to dispatch...");
-  //   if (!Object.keys(user).length) {
-  //     console.log("Dispatching in privateguard");
-  //     dispatch(refreshAccessToken());
-  //   }
-  //   setViewPage(true);
-  // }, []);
-
   useEffect(() => {
-    if (!Object.keys(Object(user)).length) {
+    let isMounted = true;
+    // We refresh token when component is mounted 1st time and if user is authenticated, i.e has token
+    // Authenticated user when refreshes browser, token in redux store is cleared
+    // But user is still authenticated(should stay logged in)
+    // `userIsAuthenticated` backs up redux store when it is cleared
+    if (!token && userIsAuthenticated) {
       refreshAccessToken()
         .then((response) => {
-          console.log("RESPONSE IN PRIVATE GUARD:: ", response);
           // Add the new Access token to redux store
           dispatch(addAuthToken({ token: response?.data?.accessToken }));
-          return getUserProfile();
+
+          return getUserProfile(); // Get user profile
         })
         .then((response) => {
           const user = response.data?.user;
+          // Add authenticated user to redux store
           dispatch(addAuthUser({ user }));
         })
         .finally(() => {
-          setViewPage(true);
+          isMounted && setDisplayPage(true);
         });
     } else {
-      setViewPage(true);
+      setDisplayPage(true);
     }
+
+    return () => (isMounted = false);
   }, []);
 
-  console.log("token loading: %s viewPage: %s", tknLoading, !viewPage);
-
-  if (!viewPage) {
-    console.log("If token loading rum=nning");
-    console.log("Viepage is:: ", viewPage);
-    return "LOADING...";
+  if (!displayPage) {
+    return "LOADING..."; // Display your loading indicator here
+  }
+  if (!userIsAuthenticated) {
+    return <Navigate to="/login" state={{ comingFrom: here }} />;
   }
 
-  if (!Object.keys(Object(user)).length) {
-    console.log("If user object is set running and its value: ", user);
-    return <Navigate to="/login" state={{ comingFrom: location }} />;
-  }
   return <Outlet />;
 };
 

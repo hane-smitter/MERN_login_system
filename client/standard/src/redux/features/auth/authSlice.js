@@ -1,21 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import jwt_decode from "jwt-decode";
-import { browserStorage } from "../../utils/browserStorage";
 
-// const savedToken = browserStorage.authTkn ?? undefined;
-const savedToken = undefined;
-let savedUser = {};
-// if (savedToken) {
-//   const { _id, fullName, email } = jwt_decode(savedToken);
-//   savedUser = { _id, fullName, email };
-// }
+import { authStorage } from "../../../utils/browserStorage";
 
 // We shall create TWO loading indicators:
 //  - One when `user` info is being processed [e.g Login, Sign up]
 //  - Two when `token` info is being processed [e.g refreshing auth]
 const initialState = {
-  user: savedUser,
-  token: savedToken,
+  user: null,
+  token: undefined,
   user_loading: false,
   token_loading: false,
 };
@@ -46,6 +38,7 @@ const authSlice = createSlice({
       };
     },
     authUserLogout() {
+      authStorage.logout(); // Clearing info stored in browser storage API
       return {
         user: {},
         token: undefined,

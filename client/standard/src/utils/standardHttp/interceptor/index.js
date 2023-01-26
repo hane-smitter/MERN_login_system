@@ -1,11 +1,10 @@
 import http from "..";
-import { newFeedBack } from "../../../redux/slices/feedbackSlice";
-import { browserStorage } from "../../browserStorage";
+import { newNotify } from "../../../redux/features/notify/notifySlice";
+import { authStorage } from "../../browserStorage";
 import {
   addAuthToken,
-  authTokenLoading,
   authUserLogout,
-} from "../../../redux/slices/authSlice";
+} from "../../../redux/features/auth/authSlice";
 import { refreshAccessToken } from "../../../api";
 
 const interceptor = (store) => {
@@ -13,7 +12,7 @@ const interceptor = (store) => {
   http.interceptors.request.use(
     (config) => {
       if (config.requireAuthHeader) {
-        const token = store?.getState()?.auth?.token || browserStorage.authTkn;
+        const token = store?.getState()?.auth?.token || authStorage.authTkn;
         config.headers.Authorization = `Bearer ${token}`;
         delete config.requireAuthHeader;
         console.log(
@@ -40,17 +39,17 @@ const interceptor = (store) => {
       async (error) => {
         console.log("---RESPONSE INTERCEPTOR RUNNING!!---");
         const config = error.config; // Ensuring this value is an Object even when it is undefined
-        const errorResponse = error?.response;
+        const responseError = error?.response;
 
         if (
-          errorResponse?.status === 401 &&
-          errorResponse?.headers?.get("www-authenticate")?.startsWith("Bearer ")
+          responseError?.status === 401 &&
+          responseError?.headers?.get("www-authenticate")?.startsWith("Bearer ")
         ) {
           // Detach the response interceptors temporarily
           http.interceptors.response.eject(responseInterceptor);
 
           try {
-            console.group("errorResponse === 401 && WWW-Authenticate Header");
+            console.group("responseError === 401 && WWW-Authenticate Header");
             console.log("AUTO REFRESHING A-T..");
             // console.log(config?.headers);
             console.groupEnd();
@@ -118,7 +117,7 @@ const interceptor = (store) => {
  */
 function logError(error, store) {
   if (error.response) {
-    // Request made and server responded
+    // Request made and server responded with error
     console.group("error.response");
     console.log(error.response.data);
     console.log(error.response.status);
@@ -135,10 +134,10 @@ function logError(error, store) {
       msg = error.response.data?.feedback;
     }
 
-    // Trigger Feedback alert in the application
+    // Trigger notification alert in the application
     store?.dispatch(
-      newFeedBack({
-        type: error.response.status,
+      newNotify({
+        variant: error.response.status,
         msg,
       })
     );
@@ -149,9 +148,9 @@ function logError(error, store) {
     console.groupEnd();
 
     store?.dispatch(
-      newFeedBack({
+      newNotify({
         msg: error.message,
-        type: "danger",
+        variant: "danger",
       })
     );
   } else {
@@ -162,8 +161,8 @@ function logError(error, store) {
     console.groupEnd();
 
     store?.dispatch(
-      newFeedBack({
-        // type: "",
+      newNotify({
+        // variant: "",
         msg: "Oops! An Error Occured!",
       })
     );

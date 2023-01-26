@@ -2,17 +2,22 @@ import React, { useState, useEffect } from "react";
 import Alert from "react-bootstrap/Alert";
 import { connect } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { closeNotify } from "../../redux/features/notify/notifySlice";
 
-import { closeFeedback } from "../../redux/slices/feedbackSlice";
-
-function AppFeedback({ openAlert, feedbackMsg, type, closeAlert, title }) {
+function AppFeedback({
+  openNotify,
+  notifyMsg,
+  type,
+  closeNotification,
+  title,
+}) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    console.log("OPEN FEEDBACK STATE: ", openAlert);
-    setOpen(openAlert);
-  }, [openAlert]);
+    console.log("OPEN FEEDBACK STATE: ", openNotify);
+    setOpen(openNotify);
+  }, [openNotify]);
 
   // When route changes, close the notification
   useEffect(() => {
@@ -26,12 +31,12 @@ function AppFeedback({ openAlert, feedbackMsg, type, closeAlert, title }) {
       <Alert
         variant={type}
         show={open}
-        onClose={closeAlert}
+        onClose={closeNotification}
         dismissible
         className="position-absolute w-100"
       >
         {title && <Alert.Heading>{title}</Alert.Heading>}
-        {feedbackMsg}
+        {notifyMsg}
       </Alert>
     </div>
   );
@@ -39,12 +44,12 @@ function AppFeedback({ openAlert, feedbackMsg, type, closeAlert, title }) {
 
 const mapStateToProps = (state) => {
   return {
-    openAlert: state.feedback.open,
-    feedbackMsg: state.feedback.msg,
-    type: state.feedback.type,
+    openNotify: state.notice.open,
+    notifyMsg: state.notice.msg,
+    type: state.notice.variant,
   };
 };
-const mapDispatchToProps = (state) => (dispatch) => ({
-  closeAlert: () => dispatch(closeFeedback()),
+const mapDispatchToProps = (dispatch) => ({
+  closeNotification: () => dispatch(closeNotify()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(AppFeedback);

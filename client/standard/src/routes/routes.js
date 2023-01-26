@@ -24,7 +24,7 @@ const router = createBrowserRouter([
           { path: "/login", element: <Login /> },
           { path: "/signup", element: <Signup /> },
           { path: "/recoverpass", element: <ForgotPass /> },
-          { path: "resetpass/:resetToken", element: <ResetPass /> },
+          { path: "/change-pass/:resetToken", element: <ResetPass /> },
         ],
       },
       {
