@@ -45,9 +45,9 @@ const UserSchema = new User({
 UserSchema.set("toJSON", {
   virtuals: true,
   transform: function (doc, ret, options) {
-    delete ret.password;
-    delete ret.tokens;
-    return ret;
+    const { firstName, lastName, email } = ret;
+
+    return { firstName, lastName, email }; // return fields we need
   },
 });
 
