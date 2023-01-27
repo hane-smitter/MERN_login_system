@@ -16,7 +16,7 @@ const REFRESH_TOKEN = {
       sameSite: "None",
       secure: true,
       httpOnly: false,
-      maxAge: 24 * 60 * 60 * 1000,
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
   },
 };
@@ -116,7 +116,7 @@ module.exports.logout = async (req, res, next) => {
       {},
       REFRESH_TOKEN.cookie.options,
       {
-        maxAge: 0,
+        expires: new Date(1),
       }
     );
 
@@ -147,7 +147,7 @@ module.exports.logoutAllDevices = async (req, res, next) => {
       {},
       REFRESH_TOKEN.cookie.options,
       {
-        maxAge: 0,
+        expires: new Date(1),
       }
     );
 
@@ -256,6 +256,7 @@ module.exports.refreshAccessToken = async (req, res, next) => {
   6. FORGOT PASSWORD
 */
 module.exports.forgotPassword = async (req, res, next) => {
+  const MSG = `If ${req.body?.email} is found with us, we've sent an email to it with instructions to reset your password.`;
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -265,7 +266,11 @@ module.exports.forgotPassword = async (req, res, next) => {
     const email = req.body.email;
 
     const user = await User.findOne({ email });
-    if (!user) throw new CustomError("Email not sent", 404);
+    // If email is not found, we throw an exception BUT with 200 status code
+    // because it is a security vulnerability to inform users
+    // that the Email is not found.
+    // To avoid username enumeration attacks, no extra response data is provided when an email is successfully sent. (The same response is provided when the username is invalid.)
+    if (!user) throw new CustomError("Reset link sent", 200, MSG);
 
     let resetToken = await user.generateResetToken();
     resetToken = encodeURIComponent(resetToken);
@@ -278,7 +283,7 @@ module.exports.forgotPassword = async (req, res, next) => {
       : `${origin}/resetpass/${resetToken}`;
     console.log("Password reset URL: %s", resetUrl);
 
-    const message = `
+    const emailMessage = `
             <h1>You have requested to change your password</h1>
             <p>You are receiving this because someone(hopefully you) has requested to reset password for your account.<br/>
               Please click on the following link, or paste in your browser to complete the password reset.
@@ -306,13 +311,13 @@ module.exports.forgotPassword = async (req, res, next) => {
     try {
       await sendEmail({
         to: user.email,
-        html: message,
+        html: emailMessage,
         subject: "Reset password",
       });
 
       res.json({
-        message:
-          "An email has been sent to your email address. Check your email, and visit the link to reset your password",
+        message: "Reset link sent",
+        feedback: MSG,
         success: true,
       });
     } catch (error) {
@@ -321,7 +326,7 @@ module.exports.forgotPassword = async (req, res, next) => {
       await user.save();
 
       console.log(error.message);
-      throw new CustomError("Email not sent", 500);
+      throw new CustomError("Internal issues standing in the way", 500);
     }
   } catch (err) {
     next(err);
