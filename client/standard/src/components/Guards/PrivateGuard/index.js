@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -7,11 +7,12 @@ import {
   addAuthToken,
   addAuthUser,
 } from "../../../redux/features/auth/authSlice";
-import { authStorage } from "../../../utils/browserStorage";
+import { AuthenticationContext } from "../../../context/authenticationContext";
+// import { authStorage } from "../../../utils/browserStorage";
 
 const PrivateRoute = () => {
   const token = useSelector((state) => state?.auth?.token);
-  const userIsAuthenticated = token || authStorage.isAuthenticated;
+  const { userIsAuthenticated } = useContext(AuthenticationContext);
 
   const [displayPage, setDisplayPage] = useState(false);
   const here = useLocation();
@@ -23,6 +24,7 @@ const PrivateRoute = () => {
     // Authenticated user when refreshes browser, token in redux store is cleared
     // But user is still authenticated(should stay logged in)
     // `userIsAuthenticated` backs up redux store when it is cleared
+    // Rehydrate redux store if it is missing and yet user is Authenticated
     if (!token && userIsAuthenticated) {
       refreshAccessToken()
         .then((response) => {

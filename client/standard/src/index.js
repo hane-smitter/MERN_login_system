@@ -5,9 +5,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import App from "./App";
 import store from "./redux/store";
-import httpInterceptor from "./utils/standardHttp/interceptor";
+import httpInterceptors from "./utils/httpRequest/interceptors";
 
-httpInterceptor.interceptor(store);
+httpInterceptors.attach(store); // Pass store
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

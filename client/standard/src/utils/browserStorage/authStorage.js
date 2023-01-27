@@ -5,11 +5,11 @@ const IsAuthenticatedName = "isAuthenticated";
 
 const authStorage = {
   /**
-   * @returns {string|undefined} - Access Token
+   * Get Authentication Token(`access token`) of Authenticated user
+   * @returns {string|undefined} - Aunthentication Token
    */
   get authTkn() {
     let token = storage.getItem(AuthTknName);
-
     if (token) {
       token = JSON.parse(token);
       return token;
@@ -19,8 +19,8 @@ const authStorage = {
   },
 
   /**
+   * Store Authentication Token(`access token`) and set authentication status
    * @param {string} token - Aunthentication Token
-   * @description - persists aunthentication token and sets authentication status
    * @returns {void}
    */
   set authTkn(token) {
@@ -45,7 +45,8 @@ const authStorage = {
    * @returns {void}
    */
   logout() {
-    storage.clear();
+    storage.removeItem(AuthTknName);
+    storage.removeItem(IsAuthenticatedName);
   },
 };
 

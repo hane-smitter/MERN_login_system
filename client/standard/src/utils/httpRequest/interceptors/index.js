@@ -7,7 +7,7 @@ import {
 } from "../../../redux/features/auth/authSlice";
 import { refreshAccessToken } from "../../../api";
 
-const interceptor = (store) => {
+const attach = (store) => {
   // REQUEST INTERCEPTOR
   http.interceptors.request.use(
     (config) => {
@@ -116,57 +116,48 @@ const interceptor = (store) => {
  * @param {Object} store - Redux Store
  */
 function logError(error, store) {
+  // Request made and server responded with error
   if (error.response) {
-    // Request made and server responded with error
-    console.group("error.response");
-    console.log(error.response.data);
-    console.log(error.response.status);
-    console.log(error.response.headers);
-    console.groupEnd();
+    const { error: respMessage, feedback: respFeedback } =
+      error.response.data;
+    const DEFAULTMSG = "Something's not right. Try again later.";
+    let notificationMsg = respFeedback || respMessage || DEFAULTMSG;
 
-    let msg;
     if (error.response.status === 401) {
-      msg = "You need to Log In";
+      notificationMsg = "You need to Log In";
 
       // Fire redux store logout action
       store?.dispatch(authUserLogout());
-    } else {
-      msg = error.response.data?.feedback;
     }
 
     // Trigger notification alert in the application
     store?.dispatch(
       newNotify({
         variant: error.response.status,
-        msg,
+        msg: notificationMsg,
       })
     );
-  } else if (error.request) {
-    // The request was made but no response was received
-    console.group("error.request");
-    console.log(error);
-    console.groupEnd();
-
+  }
+  // The request was made but no response was received
+  else if (error.request) {
     store?.dispatch(
       newNotify({
-        msg: error.message,
         variant: "danger",
+        msg: error.message,
       })
     );
-  } else {
-    // Something happened in setting up the request that triggered an Error
-    console.group("Default error structure");
-    console.log("Error ---> ", error);
-    console.log("Error ---> ", error.message);
-    console.groupEnd();
-
+  }
+  // Something happened in setting up the request that triggered an Error
+  else {
     store?.dispatch(
       newNotify({
-        // variant: "",
+        variant: "danger",
         msg: "Oops! An Error Occured!",
       })
     );
   }
 }
 
-export default { interceptor };
+const interceptors = { attach };
+
+export default interceptors;

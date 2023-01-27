@@ -24,13 +24,19 @@ function Login() {
     }),
     onSubmit: (values, actions) => {
       // alert(JSON.stringify(values, null, 2));
-      dispatch(login(values));
+      function adaptFormToResult(error, success) {
+        if (error) {
+          actions.setFieldTouched("password", false);
+          actions.setFieldValue("password", "");
+        }
+      }
+      dispatch(login(values, adaptFormToResult));
     },
   });
 
   return (
     <div style={{ maxWidth: 500, marginInline: "auto" }}>
-      <h2 className="text-uppercase mb-3">Login to your account</h2>
+      <h2 className="text-uppercase mb-3">Login to your account.</h2>
 
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className="mb-3">

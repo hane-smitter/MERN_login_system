@@ -1,7 +1,5 @@
-import jwt_decode from "jwt-decode";
 import * as API from "../../api";
 import {
-  addAuthUser,
   addAuthToken,
   authTokenLoading,
   authUserLoading,
@@ -10,7 +8,7 @@ import {
 import { newNotify } from "../features/notify/notifySlice";
 import { getUserProfile } from "./user";
 
-export function login(data) {
+export function login(data, callback) {
   return async function (dispatch) {
     try {
       dispatch(authUserLoading({ loading: true }));
@@ -32,6 +30,11 @@ export function login(data) {
       console.log("---LOGIN SUCCESS---: ", response.data);
     } catch (error) {
       console.log(error);
+
+      // Call calback if exists
+      if (callback) {
+        callback(error);
+      }
     } finally {
       dispatch(authUserLoading({ loading: false }));
     }
@@ -117,20 +120,17 @@ export function logoutEverywhere() {
 export function forgotPassword(data) {
   return async function (dispatch) {
     try {
+      const DEFAULTMSG =
+        "Password reset has been initiated. Please check your inbox for further instructions.";
       dispatch(authUserLoading({ loading: true }));
       const response = await API.forgotpass(data);
       dispatch(
         newNotify({
-          msg: "Your Password reset was successfully initiated. Please check your inbox for further instructions",
+          msg: response.data?.feedback || DEFAULTMSG,
         })
       );
     } catch (error) {
-      dispatch(
-        newNotify({
-          msg: "Oops! We couldn't initiate a password reset at this time. Please try again later",
-        })
-      );
-      console.log("Aha! We hit a block: ", error);
+      // Errors handled by axios interceptors
     } finally {
       dispatch(authUserLoading({ loading: false }));
     }
@@ -144,11 +144,12 @@ export function resetPassword(data) {
       const response = await API.resetpass(data);
       dispatch(
         newNotify({
-          msg: "Your Password has been changed successfuly. Proceed to login with your new password",
-          type: "success",
+          msg: "Your Password has been changed successfuly. Now login with your new password.",
+          variant: "success",
         })
       );
     } catch (error) {
+      // Errors handled by axios interceptors
       console.log("Aha! We hit a block: ", error);
     } finally {
       dispatch(authUserLoading({ loading: false }));

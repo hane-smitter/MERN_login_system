@@ -1,4 +1,4 @@
-import http from "../../utils/standardHttp";
+import http from "../../utils/httpRequest";
 
 /**
  * Fetch User Profile API endpoint
