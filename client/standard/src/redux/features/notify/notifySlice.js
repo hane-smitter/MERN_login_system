@@ -23,7 +23,7 @@ const notifySlice = createSlice({
     newNotify(state, action) {
       const { payload } = action;
       // ✅ "mutating" state is okay inside of createSlice!
-      state.open = Boolean(payload?.msg); // If there is a message, set open
+      state.open = "open" in payload ? payload?.open : Boolean(payload?.msg); // If there is a message, set open
       state.msg = payload?.msg || "";
       state.variant = Number.isInteger(payload?.variant)
         ? numberToStringType(payload?.variant)

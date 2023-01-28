@@ -10,7 +10,8 @@ function AppNotification({ isOpen, msg, type, close, title }) {
 
   // When route changes, close the notification
   useEffect(() => {
-    if (isOpen) close();
+    const authFailure = location.state?.reason === "NOAUTH";
+    if (isOpen && !authFailure) close();
   }, [location]);
 
   return (

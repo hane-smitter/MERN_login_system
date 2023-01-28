@@ -1,12 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { authStorage } from "../../../utils/browserStorage";
+import { AuthenticationContext } from "../../../context/authenticationContext";
 
 const PublicRoute = () => {
-  const userIsAuthenticated =
-    useSelector((state) => state?.auth?.token) || authStorage.isAuthenticated;
   const location = useLocation();
+  const { userIsAuthenticated } = useContext(AuthenticationContext);
 
   const originPath = location?.state?.comingFrom;
   const targetPath = originPath

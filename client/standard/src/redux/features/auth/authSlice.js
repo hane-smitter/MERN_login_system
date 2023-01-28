@@ -40,7 +40,7 @@ const authSlice = createSlice({
     authUserLogout() {
       authStorage.logout(); // Clearing info stored in browser storage API
       return {
-        user: {},
+        user: null,
         token: undefined,
         user_loading: false,
         token_loading: false,

@@ -118,8 +118,7 @@ const attach = (store) => {
 function logError(error, store) {
   // Request made and server responded with error
   if (error.response) {
-    const { error: respMessage, feedback: respFeedback } =
-      error.response.data;
+    const { error: respMessage, feedback: respFeedback } = error.response.data;
     const DEFAULTMSG = "Something's not right. Try again later.";
     let notificationMsg = respFeedback || respMessage || DEFAULTMSG;
 
@@ -140,6 +139,8 @@ function logError(error, store) {
   }
   // The request was made but no response was received
   else if (error.request) {
+    if (error?.code === "ERR_NETWORK") window.NetworkError = error?.code;
+
     store?.dispatch(
       newNotify({
         variant: "danger",

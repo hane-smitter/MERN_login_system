@@ -52,7 +52,9 @@ const PrivateRoute = () => {
     return "LOADING..."; // Display your loading indicator here
   }
   if (!userIsAuthenticated) {
-    return <Navigate to="/login" state={{ comingFrom: here }} />;
+    return (
+      <Navigate to="/login" state={{ comingFrom: here, reason: "NOAUTH" }} />
+    );
   }
 
   return <Outlet />;

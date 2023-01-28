@@ -104,10 +104,10 @@ export function logout() {
   };
 }
 
-export function logoutEverywhere() {
+export function logoutEveryDevice() {
   return async function (dispatch) {
     try {
-      const response = await API.logoutEverywhere();
+      const response = await API.logoutEveryDevice();
 
       console.log("---LOGOUT FROM ALL DEVICES SUCCESS---: ", response.data);
       dispatch(authUserLogout());

@@ -12,8 +12,11 @@ const store = configureStore({
 });
 
 function persistState(state) {
-  const userAuthToken = state?.auth?.token;
+  // Custom property on window when network error occurs
+  // when making http request
+  if (window.NetworkError) return delete window.NetworkError;
 
+  const userAuthToken = state?.auth?.token;
   // Persist auth token in browser storage API
   authStorage.authTkn = userAuthToken;
 }

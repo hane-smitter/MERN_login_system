@@ -1,15 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserProfile } from "../../redux/dispatchers";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
-  const dispatch = useDispatch();
-  const { user_loading, user } = useSelector((state) => state.auth);
-
-  // useEffect(() => {
-  //   dispatch(getUserProfile(user?._id));
-  // }, []);
+  const user = useSelector((state) => state.auth.user);
 
   return (
     <div className="container">
@@ -18,19 +12,8 @@ const Profile = () => {
           <h2 className="text-center m-4">Your Profile</h2>
 
           <div className="card position-relative">
-            {/* Spinner */}
-            {user_loading ? (
-              <div className="position-absolute w-100">
-                <div className="mx-auto" style={{ width: "50px" }}>
-                  <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
             <div className="card-header">
-              Details of user id :
+              Details of user:
               <ul className="list-group list-group-flush">
                 <li className="list-group-item">
                   <b>First Name: </b>

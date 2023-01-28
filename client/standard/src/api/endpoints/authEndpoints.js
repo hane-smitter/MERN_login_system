@@ -83,7 +83,7 @@ export const logout = () =>
  * Logout from All Devices API endpoint
  * @returns {Promise} - No response body
  */
-export const logoutEverywhere = () =>
+export const logoutEveryDevice = () =>
   http.post("/master-logout", {
     requireAuthHeader: true,
     withCredentials: true,

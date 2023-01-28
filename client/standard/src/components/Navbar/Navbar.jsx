@@ -4,14 +4,15 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { logout, logoutEverywhere } from "../../redux/dispatchers";
+import { useDispatch } from "react-redux";
+import { logout, logoutEveryDevice } from "../../redux/dispatchers";
 import { AuthenticationContext } from "../../context/authenticationContext";
+import { closeNotify } from "../../redux/features/notify/notifySlice";
 
 function NavBar() {
   // const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
-  const {userIsAuthenticated} = useContext(AuthenticationContext)
+  const { userIsAuthenticated } = useContext(AuthenticationContext);
 
   return (
     <Navbar
@@ -40,18 +41,27 @@ function NavBar() {
               <Nav.Link href="#sth">Something here</Nav.Link>
 
               <hr />
-              <Button as={Nav.Item} onClick={() => dispatch(logout())}>
-                Log Out
-              </Button>
-
               <NavDropdown title="Security" id="collasible-nav-dropdown-2">
                 <Button
                   as={NavDropdown.Item}
-                  onClick={() => dispatch(logoutEverywhere())}
+                  onClick={() => {
+                    dispatch(closeNotify());
+                    dispatch(logoutEveryDevice());
+                  }}
                 >
                   Log Out From All Devices
                 </Button>
               </NavDropdown>
+
+              <Button
+                as={Nav.Item}
+                onClick={() => {
+                  dispatch(closeNotify());
+                  dispatch(logout());
+                }}
+              >
+                Log Out
+              </Button>
             </Nav>
           </Navbar.Collapse>
         </>
