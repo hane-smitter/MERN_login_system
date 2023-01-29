@@ -22,7 +22,7 @@ function NavBar() {
       variant="light"
       className="px-2 mb-2 justify-content-between"
     >
-      <Navbar.Brand as={Link} to="/">
+      <Navbar.Brand as={Link} to="/" tabIndex="1">
         Capital
       </Navbar.Brand>
       {userIsAuthenticated ? (
@@ -31,17 +31,27 @@ function NavBar() {
 
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
-              <NavDropdown title="My Account" id="collasible-nav-dropdown">
+              <NavDropdown
+                title="My Account"
+                id="collasible-nav-dropdown"
+                tabIndex="1"
+              >
                 <NavDropdown.Item as={Link} to="/home/profile">
                   Profile
                 </NavDropdown.Item>
                 <NavDropdown.Item href="#settings">Settings</NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link href="#sth">Something here</Nav.Link>
+              <Nav.Link href="#sth" tabIndex="1">
+                Something here
+              </Nav.Link>
 
               <hr />
-              <NavDropdown title="Security" id="collasible-nav-dropdown-2">
+              <NavDropdown
+                title="Security"
+                id="collasible-nav-dropdown-2"
+                tabIndex="1"
+              >
                 <Button
                   as={NavDropdown.Item}
                   onClick={() => {
@@ -59,6 +69,7 @@ function NavBar() {
                   dispatch(closeNotify());
                   dispatch(logout());
                 }}
+                tabIndex="1"
               >
                 Log Out
               </Button>
@@ -71,6 +82,7 @@ function NavBar() {
           to="/login"
           className="text-uppercase fw-bolder"
           variant="outline-dark"
+          tabIndex="1"
         >
           Sign in
         </Button>

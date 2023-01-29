@@ -8,9 +8,11 @@ import {
   addAuthUser,
 } from "../../../redux/features/auth/authSlice";
 import { AuthenticationContext } from "../../../context/authenticationContext";
-// import { authStorage } from "../../../utils/browserStorage";
 
-const PrivateRoute = () => {
+let initialized = false;
+let componentIsMounted = false;
+
+const PrivateRouteGuard = () => {
   const token = useSelector((state) => state?.auth?.token);
   const { userIsAuthenticated } = useContext(AuthenticationContext);
 
@@ -19,33 +21,43 @@ const PrivateRoute = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    let isMounted = true;
+    componentIsMounted = true;
+    console.log("Initialized value is:)! ", initialized);
+    console.log("let see how many time this runs:)! ", componentIsMounted);
+
     // We refresh token when component is mounted 1st time and if user is authenticated, i.e has token
     // Authenticated user when refreshes browser, token in redux store is cleared
     // But user is still authenticated(should stay logged in)
     // `userIsAuthenticated` backs up redux store when it is cleared
     // Rehydrate redux store if it is missing and yet user is Authenticated
     if (!token && userIsAuthenticated) {
-      refreshAccessToken()
-        .then((response) => {
-          // Add the new Access token to redux store
-          dispatch(addAuthToken({ token: response?.data?.accessToken }));
+      if (!initialized) {
+        console.log("refresh Access token has been run!");
+        initialized = true;
+        refreshAccessToken()
+          .then((response) => {
+            // Add the new Access token to redux store
+            dispatch(addAuthToken({ token: response?.data?.accessToken }));
 
-          return getUserProfile(); // Get user profile
-        })
-        .then((response) => {
-          const user = response.data?.user;
-          // Add authenticated user to redux store
-          dispatch(addAuthUser({ user }));
-        })
-        .finally(() => {
-          isMounted && setDisplayPage(true);
-        });
+            return getUserProfile(); // Get user profile
+          })
+          .then((response) => {
+            const user = response.data?.user;
+            // Add authenticated user to redux store
+            dispatch(addAuthUser({ user }));
+          })
+          .finally(() => {
+            componentIsMounted && setDisplayPage(true);
+          });
+      }
     } else {
       setDisplayPage(true);
     }
 
-    return () => (isMounted = false);
+    return () => {
+      componentIsMounted = false;
+      console.log("CLEAN UP RAN: ", componentIsMounted);
+    };
   }, []);
 
   if (!displayPage) {
@@ -60,4 +72,4 @@ const PrivateRoute = () => {
   return <Outlet />;
 };
 
-export default PrivateRoute;
+export default PrivateRouteGuard;

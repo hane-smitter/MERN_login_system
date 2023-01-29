@@ -2,13 +2,13 @@ import React, { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { AuthenticationContext } from "../../../context/authenticationContext";
 
-const PublicRoute = () => {
+const PublicRouteGuard = () => {
   const location = useLocation();
   const { userIsAuthenticated } = useContext(AuthenticationContext);
 
-  const originPath = location?.state?.comingFrom;
-  const targetPath = originPath
-    ? `${originPath?.pathname}${originPath?.search}`
+  const origin = location?.state?.comingFrom;
+  const targetPath = origin
+    ? `${origin?.pathname}${origin?.search}`
     : "/home";
 
   if (userIsAuthenticated) {
@@ -17,4 +17,4 @@ const PublicRoute = () => {
   return <Outlet />;
 };
 
-export default PublicRoute;
+export default PublicRouteGuard;
