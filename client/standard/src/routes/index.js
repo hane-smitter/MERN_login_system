@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import Dashboard from "../components/Dashboard";
-import Home from "../components/Home/Home";
+import Home from "../components/Home";
 import PrivateRoute from "../components/Guards/PrivateGuard";
 import PublicRoute from "../components/Guards/PublicGuard";
-import Profile from "../components/Profile/Profile";
+import Profile from "../components/Profile";
 import AppLayout from "../pages/AppLayout";
 import Login from "../pages/LoginForm";
 import Lost from "../pages/Lost";
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/home",
+        path: "/dash",
         element: <PrivateRoute />,
         children: [
           { path: "", element: <Dashboard /> },

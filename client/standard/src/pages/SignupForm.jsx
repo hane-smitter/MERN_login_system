@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-import { signup } from "../redux/dispatchers";
+import { signup } from "../redux/actions";
 
 function Signup() {
   const dispatch = useDispatch();
@@ -35,7 +35,16 @@ function Signup() {
     }),
     onSubmit: (values, actions) => {
       // alert(JSON.stringify(values, null, 2));
-      dispatch(signup(values));
+      function alterFormToAPIResult(error, success) {
+        if (error) {
+          actions.setFieldTouched("password", false);
+          actions.setFieldValue("password", "");
+
+          actions.setFieldTouched("passwordConfirm", false);
+          actions.setFieldValue("passwordConfirm", "");
+        }
+      }
+      dispatch(signup(values, alterFormToAPIResult));
     },
   });
 
@@ -97,7 +106,7 @@ function Signup() {
             <Form.Text className="text-danger">{formik.errors.email}</Form.Text>
           ) : (
             <Form.Text className="text-muted">
-              We'll never share your email with anyone else.
+              Your email will not be shared.
             </Form.Text>
           )}
         </Form.Group>

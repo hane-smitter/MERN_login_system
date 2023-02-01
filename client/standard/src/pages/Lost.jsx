@@ -8,7 +8,7 @@ const Lost = () => {
       <span>
         <h1 className="text-uppercase text-center">Nothing is here</h1>
         <h4 className="lead text-center">
-          You are seeing this because you headed nowhere!
+          You are seeing this because you are headed into abyss!⚫
         </h4>
         <p className="text-muted text-center mt-3">
           <Button as={Link} to="/" className="text-uppercase">

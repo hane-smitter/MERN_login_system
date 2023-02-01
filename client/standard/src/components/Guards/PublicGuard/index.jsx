@@ -9,7 +9,7 @@ const PublicRouteGuard = () => {
   const origin = location?.state?.comingFrom;
   const targetPath = origin
     ? `${origin?.pathname}${origin?.search}`
-    : "/home";
+    : "/dash";
 
   if (userIsAuthenticated) {
     return <Navigate to={targetPath} />;

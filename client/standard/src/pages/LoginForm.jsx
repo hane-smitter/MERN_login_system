@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 
-import { login } from "../redux/dispatchers";
+import { login } from "../redux/actions";
 
 function Login() {
   const dispatch = useDispatch();
@@ -24,13 +24,13 @@ function Login() {
     }),
     onSubmit: (values, actions) => {
       // alert(JSON.stringify(values, null, 2));
-      function adaptFormToResult(error, success) {
+      function alterFormToAPIResult(error, success) {
         if (error) {
           actions.setFieldTouched("password", false);
           actions.setFieldValue("password", "");
         }
       }
-      dispatch(login(values, adaptFormToResult));
+      dispatch(login(values, alterFormToAPIResult));
     },
   });
 

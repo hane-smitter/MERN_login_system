@@ -5,12 +5,12 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logout, logoutEveryDevice } from "../../redux/dispatchers";
+
+import { logout, logoutEveryDevice } from "../../redux/actions";
 import { AuthenticationContext } from "../../context/authenticationContext";
 import { closeNotify } from "../../redux/features/notify/notifySlice";
 
 function NavBar() {
-  // const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
   const { userIsAuthenticated } = useContext(AuthenticationContext);
 
@@ -36,7 +36,7 @@ function NavBar() {
                 id="collasible-nav-dropdown"
                 tabIndex="1"
               >
-                <NavDropdown.Item as={Link} to="/home/profile">
+                <NavDropdown.Item as={Link} to="/dash/profile">
                   Profile
                 </NavDropdown.Item>
                 <NavDropdown.Item href="#settings">Settings</NavDropdown.Item>

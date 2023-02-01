@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-import { resetPassword } from "../redux/dispatchers";
+import { resetPassword } from "../redux/actions";
 
 function ResetPass() {
   const { resetToken } = useParams();

@@ -14,7 +14,7 @@ export function login(data, callback) {
       dispatch(authUserLoading({ loading: true }));
       const response = await API.login(data);
 
-      const { accessToken } = response.data;
+      const accessToken = response.data?.accessToken || response.data?.token;
 
       // dispatch(addAuthUser({ user: response.data?.user }));
       // const user = jwt_decode(response.data?.accessToken);
@@ -31,7 +31,7 @@ export function login(data, callback) {
     } catch (error) {
       console.log(error);
 
-      // Call calback if exists
+      // Call callback if exists
       if (callback) {
         callback(error);
       }
@@ -41,7 +41,7 @@ export function login(data, callback) {
   };
 }
 
-export function signup(data) {
+export function signup(data, callback) {
   return async function (dispatch) {
     try {
       dispatch(authUserLoading({ loading: true }));
@@ -59,6 +59,11 @@ export function signup(data) {
       dispatch(getUserProfile());
     } catch (error) {
       console.log(error);
+
+      // Call callback if exists
+      if (callback) {
+        callback(error);
+      }
     } finally {
       dispatch(authUserLoading({ loading: false }));
     }

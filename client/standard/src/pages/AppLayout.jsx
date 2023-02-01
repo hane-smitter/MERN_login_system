@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import { useSelector } from "react-redux";
 
-import NavBar from "../components/Navbar/Navbar";
+import NavBar from "../components/Navbar";
 import AppNotification from "../utils/appNotification";
 import { AuthenticationContext } from "../context/authenticationContext";
 import { authStorage } from "../utils/browserStorage";
