@@ -1,7 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { authStorage } from "../../../utils/browserStorage";
-
 // We shall create TWO loading indicators:
 //  - One when `user` info is being processed [e.g Login, Sign up]
 //  - Two when `token` info is being processed [e.g refreshing auth]
@@ -17,9 +15,11 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     addAuthToken(state, action) {
-      // ✅ This "mutating" code is okay inside of createSlice!
       const { payload } = action;
-      state.token = payload?.token;
+      return {
+        ...state,
+        token: payload?.token,
+      };
     },
     addAuthUser(state, action) {
       const { payload } = action;
@@ -30,15 +30,12 @@ const authSlice = createSlice({
     },
     authUserLoading(state, action) {
       const { payload } = action;
-      // Object.assign(state.loading, payload?.loading);
-      // state.loading = Boolean(payload?.loading);
       return {
         ...state,
         user_loading: Boolean(payload?.loading),
       };
     },
     authUserLogout() {
-      authStorage.logout(); // Clearing info stored in browser storage API
       return {
         user: null,
         token: undefined,
@@ -56,6 +53,7 @@ const authSlice = createSlice({
   },
 });
 
+// Export actions as named exports
 export const {
   addAuthToken,
   addAuthUser,
@@ -64,4 +62,5 @@ export const {
   authUserLogout,
 } = authSlice.actions;
 
+// Export reducer as default export
 export default authSlice.reducer;
