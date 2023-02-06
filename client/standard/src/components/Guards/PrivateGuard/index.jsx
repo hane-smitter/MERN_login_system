@@ -9,7 +9,7 @@ import {
 } from "../../../redux/features/auth/authSlice";
 import { AuthenticationContext } from "../../../context/authenticationContext";
 
-let initialized = false;
+let cmpntInitialized = false;
 let componentIsMounted = false;
 
 const PrivateRouteGuard = () => {
@@ -22,8 +22,8 @@ const PrivateRouteGuard = () => {
 
   useEffect(() => {
     componentIsMounted = true;
-    console.log("Initialized value is:)! ", initialized);
-    console.log("let see how many time this runs:)! ", componentIsMounted);
+    console.log("Component IS initialized:)! ", cmpntInitialized);
+    console.log("How many time this runs:)! ", componentIsMounted);
 
     // We refresh token when component is mounted 1st time and if user is authenticated, i.e has token
     // Authenticated user when refreshes browser, token in redux store is cleared
@@ -31,25 +31,26 @@ const PrivateRouteGuard = () => {
     // `userIsAuthenticated` backs up redux store when it is cleared
     // Rehydrate redux store if it is missing and yet user is Authenticated
     if (!token && userIsAuthenticated) {
-      if (!initialized) {
-        console.log("refresh Access token has been run!");
-        initialized = true;
-        refreshAccessToken()
-          .then((response) => {
-            // Add the new Access token to redux store
-            dispatch(addAuthToken({ token: response?.data?.accessToken }));
+      console.log("No TKN on redux store yet user is AUTH");
+      if (cmpntInitialized) return setDisplayPage(true);
+      // To prevent double firing in react strict mode development
+      console.log("So, refresh Access token!");
+      cmpntInitialized = true;
+      refreshAccessToken()
+        .then((response) => {
+          // Add the new Access token to redux store
+          dispatch(addAuthToken({ token: response?.data?.accessToken }));
 
-            return getUserProfile(); // Get user profile
-          })
-          .then((response) => {
-            const user = response.data?.user;
-            // Add authenticated user to redux store
-            dispatch(addAuthUser({ user }));
-          })
-          .finally(() => {
-            componentIsMounted && setDisplayPage(true);
-          });
-      }
+          return getUserProfile(); // Get user profile
+        })
+        .then((response) => {
+          const user = response.data?.user;
+          // Add authenticated user to redux store
+          dispatch(addAuthUser({ user }));
+        })
+        .finally(() => {
+          componentIsMounted && setDisplayPage(true);
+        });
     } else {
       setDisplayPage(true);
     }

@@ -9,7 +9,7 @@ import { login } from "../redux/actions";
 
 function Login() {
   const dispatch = useDispatch();
-  const { user_loading: loginLoading } = useSelector(({ auth }) => auth);
+  const loginLoading = useSelector(({ auth }) => auth.user_loading);
 
   const formik = useFormik({
     initialValues: {

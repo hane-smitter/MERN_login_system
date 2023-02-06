@@ -37,10 +37,7 @@ const authSlice = createSlice({
     },
     authUserLogout() {
       return {
-        user: null,
-        token: undefined,
-        user_loading: false,
-        token_loading: false,
+        ...initialState,
       };
     },
     authTokenLoading(state, action) {

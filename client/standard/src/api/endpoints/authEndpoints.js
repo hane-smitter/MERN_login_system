@@ -54,21 +54,15 @@ export const login = (data) => {
 export const signup = (data) =>
   http.post("/signup", data, { withCredentials: true });
 
-let refreshAccessTokenController;
 /**
  * Refresh Token API endpoint
  * @returns {Promise} - Axios promise object
  */
 export const refreshAccessToken = () => {
-  refreshAccessTokenController?.abort();
-  refreshAccessTokenController = new AbortController();
-  const signal = refreshAccessTokenController.signal;
-
   return http("/reauth", {
     method: "post",
     withCredentials: true,
     requireAuthHeader: true,
-    signal,
   });
 };
 
@@ -77,14 +71,17 @@ export const refreshAccessToken = () => {
  * @returns {Promise} - No response body
  */
 export const logout = () =>
-  http.post("/logout", { requireAuthHeader: true, withCredentials: true });
+  http.post("/logout", null, {
+    requireAuthHeader: true,
+    withCredentials: true,
+  });
 
 /**
  * Logout from All Devices API endpoint
  * @returns {Promise} - No response body
  */
 export const logoutEveryDevice = () =>
-  http.post("/master-logout", {
+  http.post("/master-logout", null, {
     requireAuthHeader: true,
     withCredentials: true,
   });

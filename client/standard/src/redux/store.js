@@ -15,7 +15,8 @@ const store = configureStore({
   devTools: process.env.NODE_ENV !== "production",
 });
 
-function persistState(state) {
+function statePersistor() {
+  const state = store.getState();
   // Custom property on window when axios encounters network error
   // when making http request
   if (window.NetworkError) return delete window.NetworkError;
@@ -25,6 +26,6 @@ function persistState(state) {
   authStorage.authTkn = userAuthToken;
 }
 
-window.addEventListener("beforeunload", () => persistState(store.getState()));
+window.addEventListener("beforeunload", statePersistor);
 
 export default store;

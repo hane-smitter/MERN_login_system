@@ -11,8 +11,13 @@ const attach = (store) => {
   // REQUEST INTERCEPTOR
   http.interceptors.request.use(
     (config) => {
+      console.log("---REQ INTERCEPTOR running---");
       if (config.requireAuthHeader) {
         const token = store?.getState()?.auth?.token || authStorage.authTkn;
+        console.log(
+          "Token retrieved on REQ intercept, ",
+          token.toString().substring(token.length - 20)
+        );
         config.headers.Authorization = `Bearer ${token}`;
         delete config.requireAuthHeader;
         console.log(

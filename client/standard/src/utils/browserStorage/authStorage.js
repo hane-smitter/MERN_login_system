@@ -1,3 +1,5 @@
+import { storageChangeEvent } from "./customEvent";
+
 const storage = sessionStorage;
 
 const AuthTknName = "u:Id";
@@ -9,13 +11,14 @@ const authStorage = {
    * @returns {string|undefined} - Aunthentication Token
    */
   get authTkn() {
-    let token = storage.getItem(AuthTknName);
-    if (token) {
+    try {
+      let token = storage.getItem(AuthTknName);
+      if (!token) return undefined;
       token = JSON.parse(token);
       return token;
+    } catch (error) {
+      return undefined;
     }
-
-    return undefined;
   },
 
   /**
@@ -24,21 +27,21 @@ const authStorage = {
    * @returns {void}
    */
   set authTkn(token) {
-    if (token) {
-      storage.setItem(AuthTknName, JSON.stringify(token));
-      storage.setItem(IsAuthenticatedName, JSON.stringify(true));
-    } else {
-      storage.setItem(IsAuthenticatedName, JSON.stringify(false));
-    }
+    if (token) storage.setItem(AuthTknName, JSON.stringify(token));
+    storage.setItem(IsAuthenticatedName, JSON.stringify(Boolean(token)));
+    window.dispatchEvent(storageChangeEvent);
   },
 
   /**
    * @returns {boolean} - Authentication status
    */
   get isAuthenticated() {
-    let isAuthenticated = JSON.parse(storage.getItem(IsAuthenticatedName));
-
-    return Boolean(isAuthenticated);
+    try {
+      const isAuthenticated = JSON.parse(storage.getItem(IsAuthenticatedName));
+      return Boolean(isAuthenticated);
+    } catch (error) {
+      return false;
+    }
   },
 
   /**
@@ -47,6 +50,8 @@ const authStorage = {
   logout() {
     storage.removeItem(AuthTknName);
     storage.removeItem(IsAuthenticatedName);
+
+    window.dispatchEvent(storageChangeEvent);
   },
 };
 
