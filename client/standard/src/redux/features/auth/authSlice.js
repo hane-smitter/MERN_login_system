@@ -1,13 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// We shall create TWO loading indicators:
-//  - One when `user` info is being processed [e.g Login, Sign up]
-//  - Two when `token` info is being processed [e.g refreshing auth]
 const initialState = {
   user: null,
   token: undefined,
-  user_loading: false,
-  token_loading: false,
+  user_loading: false, // `user` info is being processed [e.g Login]
+  token_loading: false, // when `token` info is being processed [e.g refreshing auth]
 };
 
 const authSlice = createSlice({
@@ -50,7 +47,7 @@ const authSlice = createSlice({
   },
 });
 
-// Export actions as named exports
+// Export action creators as named exports
 export const {
   addAuthToken,
   addAuthUser,

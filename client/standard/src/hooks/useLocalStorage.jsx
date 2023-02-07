@@ -10,14 +10,22 @@ function useLocalStorage(fn) {
   const [, triggerRender] = useState(0);
 
   useEffect(() => {
-    function handleStorageChange() {
+    const controller = new AbortController();
+
+    function handleStorageChange(event) {
+      event.stopPropagation();
+
       console.log("Browser storage changed!");
 
       triggerRender((prev) => prev + 1);
     }
-    window.addEventListener("storageChange", handleStorageChange);
+
+    window.addEventListener("storageChange", handleStorageChange, {
+      signal: controller.signal,
+      capture: false,
+    });
     return () => {
-      window.removeEventListener("storageChange", handleStorageChange);
+      controller.abort();
     };
   }, []);
 

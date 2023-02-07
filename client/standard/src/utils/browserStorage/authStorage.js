@@ -1,6 +1,6 @@
 import { storageChangeEvent } from "./customEvent";
 
-const storage = sessionStorage;
+const storage = sessionStorage; // The storage to use
 
 const AuthTknName = "u:Id";
 const IsAuthenticatedName = "isAuthenticated";

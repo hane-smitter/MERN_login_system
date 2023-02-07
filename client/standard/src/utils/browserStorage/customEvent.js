@@ -1,1 +1,1 @@
-export let storageChangeEvent = new Event("storageChange");
+export const storageChangeEvent = new Event("storageChange");
