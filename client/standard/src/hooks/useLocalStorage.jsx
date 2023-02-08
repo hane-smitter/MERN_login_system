@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import * as BrowserStorage from "../utils/browserStorage";
 
 // Adding hook that rerenders when local storage changes
@@ -24,6 +25,7 @@ function useLocalStorage(fn) {
       signal: controller.signal,
       capture: false,
     });
+
     return () => {
       controller.abort();
     };

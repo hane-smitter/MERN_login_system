@@ -95,7 +95,7 @@ const attach = (store) => {
             // Attach back interceptor
             registerResponseInterceptor();
 
-            // Log with error of request before trying to get new AccessToken
+            // Log with initial error
             logError(error, store);
 
             // We are rejecting with Error from initial Request

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Outlet } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import { useSelector } from "react-redux";
@@ -6,21 +7,28 @@ import NavBar from "../components/Navbar";
 import AppNotification from "../utils/appNotification";
 import { AuthenticationContext } from "../context/authenticationContext";
 import useLocalStorage from "../hooks/useLocalStorage";
-// import { authStorage } from "../utils/browserStorage";
 
 function AppLayout() {
   const hasToken = useSelector((state) => state.auth?.token);
   const authStorage = useLocalStorage((storage) => storage.authStorage);
-  const userIsAuthenticated = Boolean(hasToken) || authStorage?.isAuthenticated;
+
+  const cachedUserIsAuthenticated = useMemo(() => {
+    const userIsAuthenticated =
+      Boolean(hasToken) || authStorage?.isAuthenticated;
+
+    return userIsAuthenticated;
+  }, [hasToken, authStorage?.isAuthenticated]);
 
   console.log(
-    "User is Authenticated:: %s -- %s",
+    "User Authenticated:: %s -- %s",
     Boolean(hasToken),
     authStorage?.isAuthenticated
   );
 
   return (
-    <AuthenticationContext.Provider value={{ userIsAuthenticated }}>
+    <AuthenticationContext.Provider
+      value={{ userIsAuthenticated: cachedUserIsAuthenticated }}
+    >
       <Container fluid="md">
         <NavBar />
         {/* Component that reports to user Errors encountered */}
