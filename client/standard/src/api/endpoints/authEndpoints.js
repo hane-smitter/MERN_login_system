@@ -25,7 +25,7 @@
 - METHOD: PATCH
 */
 
-import http from "../../utils/httpRequest";
+import http from "../../utils/httpClient";
 
 let loginController;
 /**

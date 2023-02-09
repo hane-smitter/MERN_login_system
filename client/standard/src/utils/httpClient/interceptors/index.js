@@ -1,11 +1,8 @@
 import http from "..";
-import { newNotify } from "../../../redux/features/notify/notifySlice";
 import { authStorage } from "../../browserStorage";
-import {
-  addAuthToken,
-  authUserLogout,
-} from "../../../redux/features/auth/authSlice";
+import { addAuthToken } from "../../../redux/features/auth/authSlice";
 import { refreshAccessToken } from "../../../api";
+import logError from "../errorHandler";
 
 const attach = (store) => {
   // REQUEST INTERCEPTOR
@@ -36,7 +33,7 @@ const attach = (store) => {
   // RESPONSE INTERCEPTOR
   // We write the response interceptor inside a function
   // so that we may reference to it
-  function registerResponseInterceptor() {
+  function attachResponseInterceptor() {
     const responseInterceptor = http.interceptors.response.use(
       (response) => {
         return response;
@@ -72,12 +69,14 @@ const attach = (store) => {
 
             const { data } = await refreshAccessToken();
             const newAccessToken = data?.accessToken;
+
             console.log(
               "NEW A-T FROM AXIOS Interceptor",
               `...${newAccessToken
                 .toString()
                 .substring(newAccessToken.length - 20)}`
             );
+
             // Add newly obtained Access token to initial request
             config.headers.Authorization = `Bearer ${newAccessToken}`;
 
@@ -85,25 +84,14 @@ const attach = (store) => {
             store?.dispatch(addAuthToken({ token: newAccessToken }));
             console.log("JUST ADDED new AT to redux store!");
 
-            // Attach back interceptor
-            registerResponseInterceptor();
-
             // Fetch the Initial resource again
             return http({ ...config, headers: config.headers.toJSON() });
           } catch (reauthError) {
-            console.log("reauthError -- ", reauthError);
+            console.log("Re Authentication Error -- ", reauthError);
+          } finally {
             // Attach back interceptor
-            registerResponseInterceptor();
-
-            // Log with initial error
-            logError(error, store);
-
-            // We are rejecting with Error from initial Request
-            return Promise.reject(error);
+            attachResponseInterceptor();
           }
-          // finally {
-          //   store?.dispatch(authTokenLoading({ loading: false }));
-          // }
         }
 
         logError(error, store);
@@ -112,58 +100,12 @@ const attach = (store) => {
       }
     );
   }
-  registerResponseInterceptor();
+  attachResponseInterceptor();
 };
-
-/**
- * Axios Error Handler
- * @param {Error} error - Error object
- * @param {Object} store - Redux Store
- */
-function logError(error, store) {
-  // Request made and server responded with error
-  if (error.response) {
-    const { error: respMessage, feedback: respFeedback } = error.response.data;
-    const DEFAULTMSG = "Something's not right. Try again later.";
-    let notificationMsg = respFeedback || respMessage || DEFAULTMSG;
-
-    if (error.response.status === 401) {
-      notificationMsg = "You need to Log In";
-
-      // Fire redux store logout action
-      store?.dispatch(authUserLogout());
-    }
-
-    // Trigger notification alert in the application
-    store?.dispatch(
-      newNotify({
-        variant: error.response.status,
-        msg: notificationMsg,
-      })
-    );
-  }
-  // The request was made but no response was received
-  else if (error.request) {
-    if (error?.code === "ERR_NETWORK") window.NetworkError = error?.code;
-
-    store?.dispatch(
-      newNotify({
-        variant: "danger",
-        msg: error.message,
-      })
-    );
-  }
-  // Something happened in setting up the request that triggered an Error
-  else {
-    store?.dispatch(
-      newNotify({
-        variant: "danger",
-        msg: "Oops! An Error Occured!",
-      })
-    );
-  }
-}
 
 const interceptors = { attach };
 
 export default interceptors;
+
+
+/* Of primary importance to the success of any application is the health, or robustness, of the application. If the application is unstable or crashing intermittently, resolve these issues before placing it in a high availability environment. */
