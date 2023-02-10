@@ -66,6 +66,8 @@ const attach = (store) => {
             console.log("Getting A New Access Token...");
 
             // store?.dispatch(authTokenLoading({ loading: true }));
+            const MAX_RETRIES = 2;
+            config._retries = Math.abs(config._retries) || 0;
 
             const { data } = await refreshAccessToken();
             const newAccessToken = data?.accessToken;
@@ -84,13 +86,16 @@ const attach = (store) => {
             store?.dispatch(addAuthToken({ token: newAccessToken }));
             console.log("JUST ADDED new AT to redux store!");
 
+            if (config._retries >= MAX_RETRIES)
+              throw new Error(`Max retries(${config?._retries}) reached!`);
+
+            config._retries++;
+            attachResponseInterceptor();
             // Fetch the Initial resource again
             return http({ ...config, headers: config.headers.toJSON() });
           } catch (reauthError) {
-            console.log("Re Authentication Error -- ", reauthError);
-          } finally {
-            // Attach back interceptor
             attachResponseInterceptor();
+            console.log("Re Authentication Error -- ", reauthError);
           }
         }
 
@@ -106,6 +111,5 @@ const attach = (store) => {
 const interceptors = { attach };
 
 export default interceptors;
-
 
 /* Of primary importance to the success of any application is the health, or robustness, of the application. If the application is unstable or crashing intermittently, resolve these issues before placing it in a high availability environment. */

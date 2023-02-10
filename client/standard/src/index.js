@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import store from "./redux/store";
-import httpInterceptors from "./utils/httpRequest/interceptors";
+import httpInterceptors from "./utils/httpClient/interceptors";
 import App from "./App";
 
 httpInterceptors.attach(store); // Pass store
