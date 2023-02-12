@@ -5,7 +5,7 @@ import { refreshAccessToken } from "../../../api";
 import logError from "../errorHandler";
 
 const attach = (store) => {
-  // REQUEST INTERCEPTOR
+  /* 1. REQUEST INTERCEPTOR */
   http.interceptors.request.use(
     (config) => {
       console.log("---REQ INTERCEPTOR running---");
@@ -30,7 +30,7 @@ const attach = (store) => {
     }
   );
 
-  // RESPONSE INTERCEPTOR
+  /* 2. RESPONSE INTERCEPTOR */
   // We write the response interceptor inside a function
   // so that we may reference to it
   function attachResponseInterceptor() {

@@ -7,9 +7,11 @@ import { newNotify } from "../../redux/features/notify/notifySlice";
  * @param {Object} store - Redux Store
  */
 function logError(error, store) {
-  // Request made and server responded with error
+  // Request was made and server responded with error(out of 2xx status code range)
   if (error.response) {
+    // API we request to always includes `error` or `feedback` in error response
     const { error: respMessage, feedback: respFeedback } = error.response.data;
+
     const DEFAULTMSG = "Something's not right:( Try again later.";
     let notificationMsg = respFeedback || respMessage || DEFAULTMSG;
 
@@ -20,7 +22,7 @@ function logError(error, store) {
       store?.dispatch(authUserLogout());
     }
 
-    // Fire to the redux store with notification data
+    // Fire to redux store with notification data
     store?.dispatch(
       newNotify({
         variant: error.response.status,
@@ -30,6 +32,7 @@ function logError(error, store) {
   }
   // The request was made but no response was received
   else if (error.request) {
+    // Add custom variable on window object when network error occurs
     if (error?.code === "ERR_NETWORK") window.NetworkError = error?.code;
 
     store?.dispatch(
@@ -44,9 +47,10 @@ function logError(error, store) {
     store?.dispatch(
       newNotify({
         variant: "danger",
-        msg: "Oops! An Error Occured!",
+        msg: "Oh no! An Error Occured!",
       })
     );
   }
 }
- export default logError;
+
+export default logError;
