@@ -42,17 +42,15 @@ This project is built using MERN stack.
 
 ## How is it an advanced authentication system?
 
-- This project uses JWT based authentication tokens.
-- Generation of longer-lived refresh token and shorter-lived access token.
-- The refresh token is used to obtain a new Access token when it expires.
-- Silent authentication. When access token expires, the user-agent automatically reauthenticates without user intervention.
-- Server communication follows HTTP standards.
-- Cors configuration for cross-origin requests.
+- This project uses JWT based authentication.
+- _Silent and automatic_ reauthentication; without user intervention.
+- HTTP specs observed.
+- Bullet proof cors configuration for cross-origin requests.
 - Data Sanitization at Client level and Server level.
 - Forgot password/password reset.
 - Logout from all Devices.
-- Redux Toolkit for State Management.
-- Implement success/error notifications once, and it works everywhere without more boilerplate code.
+- Redux State Management with redux-toolkit.
+- One notifications component, and it works everywhere(_and automatically_).
 
 ## Getting Started
 
