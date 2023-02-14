@@ -1,33 +1,5 @@
-/* 
-- LOGIN : http://localhost:8000/api/login
-- METHOD : POST
-- Fields : email, password
-
-- SIGNUP : http://localhost:8000/api/signup
-- METHOD : POST
-- FIELDS : 
-
-- LOGOUT : http://localhost:8000/api/logout
-- METHOD : GET
-<-- Requires Authorization Header -->
-
-- REFRESHACCESSTOKEN : http://localhost:8000/api/reauth
-- METHOD : GET
-<-- Requires Authorization Header -->
-<-- Requires RefreshToken Cookie sent along -->
-
-- EMAIL PASSWORD RESET LINK : http://localhost:8000/api/forgotpass
-- METHOD : POST
-- FIELDS : email
-<-- Uses Origin header to create link to application -->
-
-- RESET PASSWORD : http://localhost:8000/api/resetpass/:resetToken
-- METHOD: PATCH
-*/
-
 import http from "../../utils/httpClient";
 
-let loginController;
 /**
  * Login API endpoint
  * @param {object} data - Account Credentials
@@ -35,12 +7,8 @@ let loginController;
  * @param {string} data.password - Password
  * @returns {Promise} - Axios promise object
  */
-export const login = (data) => {
-  loginController?.abort();
-  loginController = new AbortController();
-  const signal = loginController.signal;
-  return http.post("/login", data, { withCredentials: true, signal });
-};
+export const login = (data) =>
+  http.post("/login", data, { withCredentials: true });
 
 /**
  * Signup API endpoint
@@ -58,13 +26,12 @@ export const signup = (data) =>
  * Refresh Token API endpoint
  * @returns {Promise} - Axios promise object
  */
-export const refreshAccessToken = () => {
-  return http("/reauth", {
+export const refreshAccessToken = () =>
+  http("/reauth", {
     method: "post",
     withCredentials: true,
     requireAuthHeader: true,
   });
-};
 
 /**
  * Logout API endpoint
@@ -72,8 +39,8 @@ export const refreshAccessToken = () => {
  */
 export const logout = () =>
   http.post("/logout", null, {
-    requireAuthHeader: true,
     withCredentials: true,
+    requireAuthHeader: true,
   });
 
 /**
@@ -82,8 +49,8 @@ export const logout = () =>
  */
 export const logoutEveryDevice = () =>
   http.post("/master-logout", null, {
-    requireAuthHeader: true,
     withCredentials: true,
+    requireAuthHeader: true,
   });
 
 /**
