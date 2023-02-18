@@ -59,7 +59,7 @@ function runInterceptors(store) {
             const { data } = await refreshAccessToken();
             const newAccessToken = data?.accessToken;
 
-            // Add `Authorization` header to `config` of original request
+            // Add/replace `Authorization` header to `config` of original request
             config.headers.Authorization = `Bearer ${newAccessToken}`;
 
             // Add the new token to redux store
@@ -73,7 +73,8 @@ function runInterceptors(store) {
             return http({ ...config, headers: config.headers.toJSON() });
           } catch (reauthError) {
             attachResponseInterceptor();
-            console.log("Re Authentication Error -- ", reauthError);
+            console.log("Re Auth Error: ", reauthError);
+            /* We do not `return` so that we proceed to log error */
           }
         }
 

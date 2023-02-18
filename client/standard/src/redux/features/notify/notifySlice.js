@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+/**
+ * Converts HTTP status code to string magnitude of contextual intensity
+ * @param {number} statusCode 
+ * @returns {string}
+ */
 function numberToStringType(statusCode) {
   if (statusCode >= 400 && statusCode <= 599) {
     return "danger";

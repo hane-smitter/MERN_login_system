@@ -1,8 +1,7 @@
 import http from "../../utils/httpClient";
 
 /**
- * Fetch User Profile API endpoint
- * @param {string} id - ID of user
+ * Fetch Authenticated User Profile API endpoint
  * @returns {Promise} - Axios promise object
  */
 export const getUserProfile = () =>
