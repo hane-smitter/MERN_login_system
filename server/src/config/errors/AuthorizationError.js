@@ -2,13 +2,14 @@ const CustomError = require("./CustomError");
 
 class AuthorizationError extends CustomError {
   /**
-   * Authorization Error Constructor(fixed to status code `401`)
+   * Authorization Error Constructor
    * @param {any} [message] - Optional error payload
+   * @param {any} [number] - Status code defaults to `401`
    * @param {string} [feedback=""] - Optional feedback message you want to provide
    * @param {object} [authParams] - Authorization Parameters to set in `WWW-Authenticate` header
    */
-  constructor(message, feedback, authParams = {}) {
-    super(message, 401, feedback);
+  constructor(message, statusCode, feedback, authParams = {}) {
+    super(message, statusCode || 401, feedback);
     this.authorizationError = true;
     this.authParams = authParams;
     this.authHeaders = {

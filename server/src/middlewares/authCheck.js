@@ -20,6 +20,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
     if (!authHeader?.startsWith("Bearer "))
       throw new AuthorizationError(
         "Authentication Error",
+        undefined,
         "You are unauthenticated!",
         {
           error: "invalid_access_token",
@@ -40,6 +41,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
       if (error.name === "TokenExpiredError") {
         throw new AuthorizationError(
           "Authentication Error",
+          undefined,
           "You are unauthenticated!",
           {
             error: "expired_access_token",
@@ -50,6 +52,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
 
       throw new AuthorizationError(
         "Authentication Error",
+        undefined,
         "You are unauthenticated!"
       );
     }
@@ -57,6 +60,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
     if (!user)
       throw new AuthorizationError(
         "Authentication Error",
+        undefined,
         "You are unauthenticated!",
         {
           error: "entity_miss",
@@ -70,6 +74,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
     if (accessTknExists === -1)
       throw new AuthorizationError(
         "Authentication Error",
+        undefined,
         "You are unauthenticated!",
         {
           error: "unclaimed_access_token",

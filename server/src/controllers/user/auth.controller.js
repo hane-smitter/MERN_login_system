@@ -168,11 +168,13 @@ module.exports.logoutAllDevices = async (req, res, next) => {
 module.exports.refreshAccessToken = async (req, res, next) => {
   try {
     const cookies = req.cookies;
-    const authHeader = req.header("Authorization");
+    // const authHeader = req.header("Authorization");
+    const refreshToken = cookies[REFRESH_TOKEN.cookie.name];
 
-    if (!cookies[REFRESH_TOKEN.cookie.name]) {
+    if (!refreshToken) {
       throw new AuthorizationError(
         "Authentication error!",
+        400,
         "You are unauthenticated",
         {
           realm: "reauth",
@@ -181,39 +183,16 @@ module.exports.refreshAccessToken = async (req, res, next) => {
         }
       );
     }
-    if (!authHeader?.startsWith("Bearer ")) {
-      throw new AuthorizationError(
-        "Authentication Error",
-        "You are unauthenticated!",
-        {
-          realm: "reauth",
-          error: "invalid_access_token",
-          error_description: "access token error",
-        }
-      );
-    }
 
-    const accessTokenParts = authHeader.split(" ");
-    const staleAccessTkn = accessTokenParts[1];
-
-    const decodedExpiredAccessTkn = jwt.verify(
-      staleAccessTkn,
-      ACCESS_TOKEN.secret,
-      {
-        ignoreExpiration: true,
-      }
-    );
-
-    const rfTkn = cookies[REFRESH_TOKEN.cookie.name];
-    const decodedRefreshTkn = jwt.verify(rfTkn, REFRESH_TOKEN.secret);
-
+    const decodedRefreshTkn = jwt.verify(refreshToken, REFRESH_TOKEN.secret);
     const userWithRefreshTkn = await User.findOne({
       _id: decodedRefreshTkn._id,
-      "tokens.token": staleAccessTkn,
+      // "tokens.token": staleAccessTkn,
     });
     if (!userWithRefreshTkn) {
       throw new AuthorizationError(
         "Authentication Error",
+        400,
         "You are unauthenticated!",
         {
           realm: "reauth",
@@ -221,28 +200,33 @@ module.exports.refreshAccessToken = async (req, res, next) => {
       );
     }
     // Delete the stale access token
-    console.log("Removing Stale access tkn from DB in refresh handler...");
+    /* console.log("Removing Stale access tkn from DB in refresh handler...");
     userWithRefreshTkn.tokens = userWithRefreshTkn.tokens.filter(
       (tokenObj) => tokenObj.token !== staleAccessTkn
     );
     await userWithRefreshTkn.save();
-    console.log("...Tkn removED!");
+    console.log("...Tkn removED!"); */
 
     // GENERATE NEW ACCESSTOKEN
-    const accessToken = await userWithRefreshTkn.generateAcessToken();
+    const newAT = await userWithRefreshTkn.generateAcessToken();
+    // GENERATE NEW REFRESHTOKEN
+    const newRT = await userWithRefreshTkn.generateRefreshToken();
 
-    // Send back new created accessToken
     res.status(201);
     res.set({ "Cache-Control": "no-store", Pragma: "no-cache" });
+    // Set NEW refresh Token in cookie
+    // res.cookie(REFRESH_TOKEN.cookie.name, newRT, REFRESH_TOKEN.cookie.options);
+
+    // Send response with NEW accessToken
     res.json({
       success: true,
-      accessToken,
+      accessToken: newAT,
     });
   } catch (error) {
     console.log(error);
     if (error?.name === "JsonWebTokenError") {
       return next(
-        new AuthorizationError(error, "You are unauthenticated", {
+        new AuthorizationError(error, 400, "You are unauthenticated", {
           realm: "reauth",
           error_description: "token error",
         })
