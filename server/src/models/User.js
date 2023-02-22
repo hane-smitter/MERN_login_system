@@ -90,7 +90,7 @@ UserSchema.statics.findByCredentials = async (email, password) => {
 /* 
 5. ATTACH CUSTOM INSTANCE METHODS
  */
-UserSchema.methods.generateAcessToken = async function () {
+UserSchema.methods.generateAcessToken = function () {
   const user = this;
 
   // Create signed access token
@@ -106,14 +106,10 @@ UserSchema.methods.generateAcessToken = async function () {
     }
   );
 
-  // Save to database
-  user.tokens.push({ token: accessToken });
-  await user.save();
-
   return accessToken;
 };
 
-UserSchema.methods.generateRefreshToken = function () {
+UserSchema.methods.generateRefreshToken = async function () {
   const user = this;
 
   // Create signed refresh token
@@ -126,6 +122,16 @@ UserSchema.methods.generateRefreshToken = function () {
       expiresIn: REFRESH_TOKEN.expiry,
     }
   );
+
+  // Create a access token hash
+  const rTknHash = crypto
+    .createHmac("sha256", REFRESH_TOKEN.secret)
+    .update(refreshToken)
+    .digest("hex");
+
+  // Save to database
+  user.tokens.push({ token: rTknHash });
+  await user.save();
 
   return refreshToken;
 };

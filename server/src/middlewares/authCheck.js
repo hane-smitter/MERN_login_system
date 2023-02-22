@@ -24,71 +24,49 @@ module.exports.requireAuthentication = async (req, res, next) => {
         "You are unauthenticated!",
         {
           error: "invalid_access_token",
-          error_description: "access token error",
+          error_description: "unknown authentication scheme",
         }
       );
 
     const accessTokenParts = authHeader.split(" ");
-    const accessTkn = accessTokenParts[1];
+    const aTkn = accessTokenParts[1];
 
-    let user = null;
-    try {
-      const decoded = jwt.verify(accessTkn, ACCESS_TOKEN.secret);
-      user = await User.findById(decoded._id);
-    } catch (error) {
-      // Rethrow error so it is captured by the outer `catch() {...}` block
-
-      if (error.name === "TokenExpiredError") {
-        throw new AuthorizationError(
-          "Authentication Error",
-          undefined,
-          "You are unauthenticated!",
-          {
-            error: "expired_access_token",
-            error_description: "access token is expired",
-          }
-        );
-      }
-
-      throw new AuthorizationError(
-        "Authentication Error",
-        undefined,
-        "You are unauthenticated!"
-      );
-    }
+    const decoded = jwt.verify(aTkn, ACCESS_TOKEN.secret);
+    let user = await User.findById(decoded._id);
 
     if (!user)
       throw new AuthorizationError(
         "Authentication Error",
         undefined,
-        "You are unauthenticated!",
+        "Entity in claim does not exist!",
         {
           error: "entity_miss",
-          error_description: "unknown access token",
-        }
-      );
-
-    const accessTknExists = user.tokens.findIndex(
-      (tokenObj) => tokenObj.token === accessTkn
-    );
-    if (accessTknExists === -1)
-      throw new AuthorizationError(
-        "Authentication Error",
-        undefined,
-        "You are unauthenticated!",
-        {
-          error: "unclaimed_access_token",
-          error_description: "forsaken access token",
+          error_description: "no entity owns access token",
         }
       );
 
     // Attach authenticated user and Access Token to request object
     req.user = user;
-    req.token = accessTkn;
+    req.token = aTkn;
     next();
   } catch (err) {
     // Authentication didn't go well
     console.log(err);
+
+    const expParams = {
+      error: "expired_access_token",
+      error_description: "access token is expired",
+    };
+    if (err.name === "TokenExpiredError")
+      return next(
+        new AuthorizationError(
+          "Authentication Error",
+          undefined,
+          "Token lifetime is over!",
+          expParams
+        )
+      );
+
     next(err);
   }
 };

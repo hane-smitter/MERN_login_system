@@ -20,9 +20,9 @@ const REFRESH_TOKEN = {
     },
   },
 };
-const ACCESS_TOKEN = {
-  secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
-};
+// const ACCESS_TOKEN = {
+//   secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
+// };
 const RESET_PASSWORD_TOKEN = {
   expiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS,
 };
@@ -41,7 +41,7 @@ module.exports.login = async (req, res, next) => {
 
     /* Custom methods on user are defined in User model */
     const user = await User.findByCredentials(email, password); // Identify and retrieve user by credentials
-    const accessToken = await user.generateAcessToken(); // Create Access Token
+    const aTkn = await user.generateAcessToken(); // Create Access Token
     const refreshToken = await user.generateRefreshToken(); // Create Refresh Token
 
     // SET refresh Token cookie in response
@@ -55,7 +55,7 @@ module.exports.login = async (req, res, next) => {
     res.json({
       success: true,
       user,
-      accessToken,
+      accessToken: aTkn,
     });
   } catch (error) {
     console.log(error);
@@ -77,7 +77,7 @@ module.exports.signup = async (req, res, next) => {
     /* Custom methods on newUser are defined in User model */
     const newUser = new User({ firstName, lastName, email, password });
     await newUser.save(); // Save new User to DB
-    const accessToken = await newUser.generateAcessToken(); // Create Access Token
+    const aTkn = await newUser.generateAcessToken(); // Create Access Token
     const refreshToken = await newUser.generateRefreshToken(); // Create Refresh Token
 
     // SET refresh Token cookie in response
@@ -91,7 +91,7 @@ module.exports.signup = async (req, res, next) => {
     res.status(201).json({
       success: true,
       user: newUser,
-      accessToken,
+      accessToken: aTkn,
     });
   } catch (error) {
     console.log(error);
@@ -107,11 +107,18 @@ module.exports.logout = async (req, res, next) => {
     // Authenticated user attached on `req` by authentication middleware
     const user = req.user;
 
-    const aTkn = req.token;
-    user.tokens = user.tokens.filter((tokenObj) => tokenObj.token !== aTkn);
+    const cookies = req.cookies;
+    // const authHeader = req.header("Authorization");
+    const refreshToken = cookies[REFRESH_TOKEN.cookie.name];
+    // Create a access token hash
+    const rTknHash = crypto
+      .createHmac("sha256", REFRESH_TOKEN.secret)
+      .update(refreshToken)
+      .digest("hex");
+    user.tokens = user.tokens.filter((tokenObj) => tokenObj.token !== rTknHash);
     await user.save();
 
-    // Set cookie maxAge to zero to expire it immediately
+    // Set cookie expiry to past date so it is destroyed
     const expireCookieOptions = Object.assign(
       {},
       REFRESH_TOKEN.cookie.options,
@@ -142,7 +149,7 @@ module.exports.logoutAllDevices = async (req, res, next) => {
     user.tokens = undefined;
     await user.save();
 
-    // Set cookie maxAge to zero to expire it immediately
+    // Set cookie expiry to past date to mark for destruction
     const expireCookieOptions = Object.assign(
       {},
       REFRESH_TOKEN.cookie.options,
@@ -174,7 +181,7 @@ module.exports.refreshAccessToken = async (req, res, next) => {
     if (!refreshToken) {
       throw new AuthorizationError(
         "Authentication error!",
-        400,
+        undefined,
         "You are unauthenticated",
         {
           realm: "reauth",
@@ -185,53 +192,46 @@ module.exports.refreshAccessToken = async (req, res, next) => {
     }
 
     const decodedRefreshTkn = jwt.verify(refreshToken, REFRESH_TOKEN.secret);
+    const rTknHash = crypto
+      .createHmac("sha256", REFRESH_TOKEN.secret)
+      .update(refreshToken)
+      .digest("hex");
     const userWithRefreshTkn = await User.findOne({
       _id: decodedRefreshTkn._id,
-      // "tokens.token": staleAccessTkn,
+      "tokens.token": rTknHash,
     });
-    if (!userWithRefreshTkn) {
+    if (!userWithRefreshTkn)
       throw new AuthorizationError(
         "Authentication Error",
-        400,
+        undefined,
         "You are unauthenticated!",
         {
           realm: "reauth",
         }
       );
-    }
-    // Delete the stale access token
-    /* console.log("Removing Stale access tkn from DB in refresh handler...");
-    userWithRefreshTkn.tokens = userWithRefreshTkn.tokens.filter(
-      (tokenObj) => tokenObj.token !== staleAccessTkn
-    );
-    await userWithRefreshTkn.save();
-    console.log("...Tkn removED!"); */
 
     // GENERATE NEW ACCESSTOKEN
-    const newAT = await userWithRefreshTkn.generateAcessToken();
+    const newAtkn = await userWithRefreshTkn.generateAcessToken();
     // GENERATE NEW REFRESHTOKEN
-    const newRT = await userWithRefreshTkn.generateRefreshToken();
+    // const newRtkn = await userWithRefreshTkn.generateRefreshToken();
 
     res.status(201);
     res.set({ "Cache-Control": "no-store", Pragma: "no-cache" });
-    // Set NEW refresh Token in cookie
-    // res.cookie(REFRESH_TOKEN.cookie.name, newRT, REFRESH_TOKEN.cookie.options);
 
     // Send response with NEW accessToken
     res.json({
       success: true,
-      accessToken: newAT,
+      accessToken: newAtkn,
     });
   } catch (error) {
     console.log(error);
-    if (error?.name === "JsonWebTokenError") {
+    if (error?.name === "JsonWebTokenError")
       return next(
-        new AuthorizationError(error, 400, "You are unauthenticated", {
+        new AuthorizationError(error, undefined, "You are unauthenticated", {
           realm: "reauth",
           error_description: "token error",
         })
       );
-    }
     next(error);
   }
 };
