@@ -27,7 +27,7 @@ const authStorage = {
    * @returns {void}
    */
   set authTkn(token) {
-    if (token) storage.setItem(AuthTknName, JSON.stringify(token));
+    // if (token) storage.setItem(AuthTknName, JSON.stringify(token));
     storage.setItem(IsAuthenticatedName, JSON.stringify(Boolean(token)));
     window.dispatchEvent(storageChangeEvent);
   },

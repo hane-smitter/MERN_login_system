@@ -30,7 +30,6 @@ export const refreshAccessToken = () =>
   http("/reauth", {
     method: "post",
     withCredentials: true,
-    requireAuthHeader: true,
   });
 
 /**

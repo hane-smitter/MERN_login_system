@@ -12,7 +12,7 @@ function runInterceptors(store) {
     (config) => {
       if (config.requireAuthHeader) {
         // Retrieve authentication token from redux store or localStorage
-        const token = store?.getState()?.auth?.token || authStorage.authTkn;
+        const token = store?.getState()?.auth?.token;
         // Create an Authorization header and add the token
         config.headers.Authorization = `Bearer ${token}`;
         delete config.requireAuthHeader;

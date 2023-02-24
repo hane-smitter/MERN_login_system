@@ -66,7 +66,11 @@ const PrivateRouteGuard = () => {
   }
   if (!userIsAuthenticated) {
     return (
-      <Navigate to="/login" state={{ comingFrom: here, reason: "NOAUTH" }} />
+      <Navigate
+        to="/login"
+        state={{ comingFrom: here, reason: "NOAUTH" }}
+        replace
+      />
     );
   }
 

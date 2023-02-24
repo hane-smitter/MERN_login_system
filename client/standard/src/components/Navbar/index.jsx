@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -22,7 +22,7 @@ function NavBar() {
       variant="light"
       className="px-2 mb-2 justify-content-between"
     >
-      <Navbar.Brand as={Link} to="/" tabIndex="1">
+      <Navbar.Brand as={Link} to="/" tabIndex="1" rel="opener">
         Capital
       </Navbar.Brand>
       {userIsAuthenticated ? (
