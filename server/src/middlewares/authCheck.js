@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 
 const AuthorizationError = require("../config/errors/AuthorizationError.js");
-const User = require("../models/User.js");
 
 // Pull in Environment variables
 const ACCESS_TOKEN = {
@@ -32,21 +31,9 @@ module.exports.requireAuthentication = async (req, res, next) => {
     const aTkn = accessTokenParts[1];
 
     const decoded = jwt.verify(aTkn, ACCESS_TOKEN.secret);
-    let user = await User.findById(decoded._id);
-
-    if (!user)
-      throw new AuthorizationError(
-        "Authentication Error",
-        undefined,
-        "Entity in claim does not exist!",
-        {
-          error: "entity_miss",
-          error_description: "no entity owns access token",
-        }
-      );
 
     // Attach authenticated user and Access Token to request object
-    req.user = user;
+    req.userId = decoded._id;
     req.token = aTkn;
     next();
   } catch (err) {
@@ -62,7 +49,7 @@ module.exports.requireAuthentication = async (req, res, next) => {
         new AuthorizationError(
           "Authentication Error",
           undefined,
-          "Token lifetime is over!",
+          "Token lifetime exceeded!",
           expParams
         )
       );

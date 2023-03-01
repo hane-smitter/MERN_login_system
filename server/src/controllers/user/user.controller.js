@@ -31,9 +31,12 @@ module.exports.fetchUserProfile = async (req, res, next) => {
 */
 module.exports.fetchAuthUserProfile = async (req, res, next) => {
   try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+
     res.json({
       success: true,
-      user: req.user,
+      user,
     });
   } catch (error) {
     console.log(error);

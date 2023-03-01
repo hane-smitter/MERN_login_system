@@ -104,8 +104,9 @@ module.exports.signup = async (req, res, next) => {
 */
 module.exports.logout = async (req, res, next) => {
   try {
-    // Authenticated user attached on `req` by authentication middleware
-    const user = req.user;
+    // Authenticated user ID attached on `req` by authentication middleware
+    const userId = req.userId;
+    const user = await User.findById(userId);
 
     const cookies = req.cookies;
     // const authHeader = req.header("Authorization");
@@ -143,8 +144,9 @@ module.exports.logout = async (req, res, next) => {
 */
 module.exports.logoutAllDevices = async (req, res, next) => {
   try {
-    // Authenticated user attached on `req` by authentication middleware
-    const user = req.user;
+    // Authenticated user ID attached on `req` by authentication middleware
+    const userId = req.userId;
+    const user = await User.findById(userId);
 
     user.tokens = undefined;
     await user.save();
