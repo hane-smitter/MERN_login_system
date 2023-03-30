@@ -8,8 +8,8 @@ class AuthorizationError extends CustomError {
    * @param {string} [feedback=""] - Feedback message
    * @param {object} [authParams] - Authorization Parameters to set in `WWW-Authenticate` header
    */
-  constructor(message, statusCode = 401, feedback, authParams) {
-    super(message, statusCode, feedback);
+  constructor(message, statusCode, feedback, authParams) {
+    super(message, statusCode || 401, feedback); // Call parent constructor with args
     this.authorizationError = true;
     this.authParams = authParams || {};
     this.authHeaders = {
@@ -17,6 +17,7 @@ class AuthorizationError extends CustomError {
     };
   }
 
+  // Private Method to convert object `key: value` to string `key=value`
   #stringifyAuthParams() {
     let str = "";
 
@@ -30,20 +31,17 @@ class AuthorizationError extends CustomError {
     if (otherParams.length < 1) return str;
 
     otherParams.forEach((authParam, index, array) => {
-      // Delete other `realms` if they exist
+      // Delete other `realm(s)` if exists
       if (authParam.toLowerCase() === "realm") {
         delete others[authParam];
       }
 
       let comma = ",";
-      // If is last Item
-      if (array.length - 1 === index) {
-        comma = "";
-      }
+      // If is last Item then no comma
+      if (array.length - 1 === index) comma = "";
+
       str = str + ` ${authParam}=${this.authParams[authParam]}${comma}`;
     });
-
-    // console.log("--Authenticate header string constructed: -- ", str);
 
     return str;
   }
