@@ -123,13 +123,13 @@ UserSchema.methods.generateRefreshToken = async function () {
     }
   );
 
-  // Create a access token hash
+  // Create a 'refresh token hash' from 'refresh token'
   const rTknHash = crypto
     .createHmac("sha256", REFRESH_TOKEN.secret)
     .update(refreshToken)
     .digest("hex");
 
-  // Save to database
+  // Save 'refresh token hash' to database
   user.tokens.push({ token: rTknHash });
   await user.save();
 
