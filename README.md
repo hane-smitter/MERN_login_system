@@ -1,10 +1,16 @@
 # MERN Login System
+
 <!--
 https://dev-to-uploads.s3.amazonaws.com/uploads/articles/be6k63aiuu0m1rq1tjsb.jpg
 -->
-This project runs down a **a methodical framework** of how to implement an **advanced** authentication system in a _3-tier application architecture_.
 
-This can serve as a boilerplate to bootstrap authentication logic for your next application.
+This project is an implementation of _JWT authentication_ to build a Login system between an API and front-end app that works as a whole.
+
+This can serve as a boilerplate to bootstrap authentication logic for your web app.
+
+## How it is built
+
+### See this [blog](https://dev.to/smitterhane/a-meticulous-jwt-api-authentication-guide-youve-been-looking-for-47dg).
 
 ## Technologies used
 

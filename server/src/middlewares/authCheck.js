@@ -7,12 +7,6 @@ const ACCESS_TOKEN = {
   secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
 };
 
-/* 
-- Check if token is provided in the Authorization Header.
-- `jwt.verify()` the token:
-    - If token is invalid or expired, throw an `AuthorizationError`.
-- Check if the provided token is in the database record of its associated user.
-*/
 module.exports.requireAuthentication = async (req, res, next) => {
   try {
     const authHeader = req.header("Authorization");

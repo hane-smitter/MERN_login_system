@@ -141,7 +141,7 @@ UserSchema.methods.generateResetToken = async function () {
   const resetTokenSecret = crypto.randomBytes(10).toString("hex");
   const user = this;
 
-  // Separator of `+` because generated base64url characters don't include this character
+  // Separator of `+` because generated base64url characters doesn't include this character
   const resetToken = `${resetTokenValue}+${resetTokenSecret}`;
 
   // Create a hash
