@@ -23,7 +23,7 @@ class AuthorizationError extends CustomError {
 
     let { realm, ...others } = this.authParams;
 
-    realm = realm ? realm : "apps";
+    realm = realm || "Access to user account";
 
     str = `realm=${realm}`;
 

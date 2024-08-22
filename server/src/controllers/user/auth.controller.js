@@ -15,7 +15,7 @@ const REFRESH_TOKEN = {
     options: {
       sameSite: "None",
       secure: true,
-      httpOnly: false,
+      httpOnly: true,
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
   },
@@ -109,9 +109,8 @@ module.exports.logout = async (req, res, next) => {
     const user = await User.findById(userId);
 
     const cookies = req.cookies;
-    // const authHeader = req.header("Authorization");
     const refreshToken = cookies[REFRESH_TOKEN.cookie.name];
-    // Create a access token hash
+    // Create a refresh token hash
     const rTknHash = crypto
       .createHmac("sha256", REFRESH_TOKEN.secret)
       .update(refreshToken)
@@ -119,7 +118,7 @@ module.exports.logout = async (req, res, next) => {
     user.tokens = user.tokens.filter((tokenObj) => tokenObj.token !== rTknHash);
     await user.save();
 
-    // Set cookie expiry to past date so it is destroyed
+    // Set cookie expiry option to past date so it is destroyed
     const expireCookieOptions = Object.assign(
       {},
       REFRESH_TOKEN.cookie.options,
@@ -128,7 +127,7 @@ module.exports.logout = async (req, res, next) => {
       }
     );
 
-    // Destroy refresh token cookie
+    // Destroy refresh token cookie with `expireCookieOptions` containing a past date
     res.cookie(REFRESH_TOKEN.cookie.name, "", expireCookieOptions);
     res.status(205).json({
       success: true,
@@ -177,7 +176,6 @@ module.exports.logoutAllDevices = async (req, res, next) => {
 module.exports.refreshAccessToken = async (req, res, next) => {
   try {
     const cookies = req.cookies;
-    // const authHeader = req.header("Authorization");
     const refreshToken = cookies[REFRESH_TOKEN.cookie.name];
 
     if (!refreshToken) {
@@ -186,7 +184,7 @@ module.exports.refreshAccessToken = async (req, res, next) => {
         undefined,
         "You are unauthenticated",
         {
-          realm: "reauth",
+          realm: "Obtain new Access Token",
           error: "no_rft",
           error_description: "Refresh Token is missing!",
         }
@@ -208,14 +206,12 @@ module.exports.refreshAccessToken = async (req, res, next) => {
         undefined,
         "You are unauthenticated!",
         {
-          realm: "reauth",
+          realm: "Obtain new Access Token",
         }
       );
 
     // GENERATE NEW ACCESSTOKEN
     const newAtkn = await userWithRefreshTkn.generateAcessToken();
-    // GENERATE NEW REFRESHTOKEN
-    // const newRtkn = await userWithRefreshTkn.generateRefreshToken();
 
     res.status(201);
     res.set({ "Cache-Control": "no-store", Pragma: "no-cache" });
@@ -226,14 +222,20 @@ module.exports.refreshAccessToken = async (req, res, next) => {
       accessToken: newAtkn,
     });
   } catch (error) {
-    console.log(error);
-    if (error?.name === "JsonWebTokenError")
-      return next(
-        new AuthorizationError(error, undefined, "You are unauthenticated", {
-          realm: "reauth",
-          error_description: "token error",
-        })
+    if (error?.name === "JsonWebTokenError") {
+      next(
+        new AuthorizationError(
+          error,
+          undefined,
+          "You are unauthenticated",
+          {
+            realm: "Obtain new Access Token",
+            error_description: "token error",
+          }
+        )
       );
+      return;
+    }
     next(error);
   }
 };
