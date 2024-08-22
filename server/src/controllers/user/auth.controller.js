@@ -224,15 +224,10 @@ module.exports.refreshAccessToken = async (req, res, next) => {
   } catch (error) {
     if (error?.name === "JsonWebTokenError") {
       next(
-        new AuthorizationError(
-          error,
-          undefined,
-          "You are unauthenticated",
-          {
-            realm: "Obtain new Access Token",
-            error_description: "token error",
-          }
-        )
+        new AuthorizationError(error, undefined, "You are unauthenticated", {
+          realm: "Obtain new Access Token",
+          error_description: "token error",
+        })
       );
       return;
     }
@@ -244,7 +239,10 @@ module.exports.refreshAccessToken = async (req, res, next) => {
   6. FORGOT PASSWORD
 */
 module.exports.forgotPassword = async (req, res, next) => {
-  const MSG = `If ${req.body?.email} is found with us, we've sent an email to it with instructions to reset your password.`;
+  const MSG = `If ${
+    req.body?.email || "__"
+  } is found with us, we've sent an email to it with instructions to reset your password.`;
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -326,7 +324,6 @@ module.exports.forgotPassword = async (req, res, next) => {
 */
 module.exports.resetPassword = async (req, res, next) => {
   try {
-    console.log("req.params: ", req.params);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       throw new CustomError(errors.array(), 422);
@@ -335,8 +332,6 @@ module.exports.resetPassword = async (req, res, next) => {
     const resetToken = new String(req.params.resetToken);
 
     const [tokenValue, tokenSecret] = decodeURIComponent(resetToken).split("+");
-
-    console.log({ tokenValue, tokenSecret });
 
     // Recreate the reset Token hash
     const resetTokenHash = crypto
@@ -349,9 +344,8 @@ module.exports.resetPassword = async (req, res, next) => {
       resetpasswordtokenexpiry: { $gt: Date.now() },
     });
     if (!user) throw new CustomError("The reset link is invalid", 400);
-    console.log(user);
 
-    user.password = req.body.password;
+    user.password = req.body.password; // Will be hashed by mongoose middleware
     user.resetpasswordtoken = undefined;
     user.resetpasswordtokenexpiry = undefined;
 
