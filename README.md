@@ -81,7 +81,7 @@ Next you need to get configurations for `.env` files.<br />
 It should be looking like this:
 
 ```
-MONGODB_CLOUD=
+MONGODB_URI=
 AUTH_REFRESH_TOKEN_SECRET=
 AUTH_REFRESH_TOKEN_EXPIRY=
 AUTH_ACCESS_TOKEN_SECRET=
@@ -92,17 +92,17 @@ EMAIL_FROM=
 RESET_PASSWORD_TOKEN_EXPIRY_MINS=
 ```
 
-| Name                             | Description                                                    |
-| -------------------------------- | -------------------------------------------------------------- |
-| MONGODB_CLOUD                    | MongoDB Atlas connection string                                |
-| AUTH_REFRESH_TOKEN_SECRET        | Secret that will be used to sign **Refresh token**             |
-| AUTH_REFRESH_TOKEN_EXPIRY        | Expiry length of the Refresh Token                             |
-| AUTH_ACCESS_TOKEN_SECRET         | Secret that will be used to sign **Access token**              |
-| AUTH_ACCESS_TOKEN_EXPIRY         | Expiry length of the Access Token                              |
-| RESET_PASSWORD_TOKEN_EXPIRY_MINS | Time in Minutes to expiry of password reset link. Default is 5 |
-| AUTH_EMAIL_USERNAME              | SMTP email username to be used with NodeMailer                 |
-| AUTH_EMAIL_PASSWORD              | SMTP email password to be used with NodeMailer                 |
-| EMAIL_FROM                       | The sender that will be set when sending email                 |
+| Name                             | Description                                                                               |
+| -------------------------------- | ----------------------------------------------------------------------------------------- |
+| MONGODB_URI                      | Connection string to MongoDB database. It could be Atlas or local installation of MongoDB |
+| AUTH_REFRESH_TOKEN_SECRET        | Secret that will be used to sign **Refresh token**                                        |
+| AUTH_REFRESH_TOKEN_EXPIRY        | Expiry length of the Refresh Token                                                        |
+| AUTH_ACCESS_TOKEN_SECRET         | Secret that will be used to sign **Access token**                                         |
+| AUTH_ACCESS_TOKEN_EXPIRY         | Expiry length of the Access Token                                                         |
+| RESET_PASSWORD_TOKEN_EXPIRY_MINS | Time in Minutes to expiry of password reset link. Default is 5                            |
+| AUTH_EMAIL_USERNAME              | SMTP email username to be used with NodeMailer                                            |
+| AUTH_EMAIL_PASSWORD              | SMTP email password to be used with NodeMailer                                            |
+| EMAIL_FROM                       | The sender that will be set when sending email                                            |
 
 ## Run the project
 
